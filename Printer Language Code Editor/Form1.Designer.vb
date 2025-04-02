@@ -33,6 +33,7 @@ Partial Class RawFileEdit
         Me.TreeView1 = New System.Windows.Forms.TreeView()
         Me.ImageList1 = New System.Windows.Forms.ImageList(Me.components)
         Me.pnlZPL = New System.Windows.Forms.Panel()
+        Me.Button1 = New System.Windows.Forms.Button()
         Me.ComboBox1 = New System.Windows.Forms.ComboBox()
         Me.Label2 = New System.Windows.Forms.Label()
         Me.TextBox2 = New System.Windows.Forms.TextBox()
@@ -44,7 +45,7 @@ Partial Class RawFileEdit
         Me.cmdDelete = New System.Windows.Forms.ToolStripButton()
         Me.cmdSave = New System.Windows.Forms.ToolStripButton()
         Me.cmdPrint = New System.Windows.Forms.ToolStripButton()
-        Me.Button1 = New System.Windows.Forms.Button()
+        Me.Button2 = New System.Windows.Forms.Button()
         Me.ContextMenuStrip6.SuspendLayout()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
@@ -65,42 +66,43 @@ Partial Class RawFileEdit
         '
         'ContextMenuStrip6
         '
+        Me.ContextMenuStrip6.ImageScalingSize = New System.Drawing.Size(24, 24)
         Me.ContextMenuStrip6.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AddToolStripMenuItem, Me.DeleteToolStripMenuItem, Me.SaveToolStripMenuItem, Me.PrintToolStripMenuItem})
         Me.ContextMenuStrip6.Name = "ContextMenuStrip6"
-        Me.ContextMenuStrip6.Size = New System.Drawing.Size(108, 92)
+        Me.ContextMenuStrip6.Size = New System.Drawing.Size(143, 132)
         '
         'AddToolStripMenuItem
         '
         Me.AddToolStripMenuItem.Image = CType(resources.GetObject("AddToolStripMenuItem.Image"), System.Drawing.Image)
         Me.AddToolStripMenuItem.Name = "AddToolStripMenuItem"
-        Me.AddToolStripMenuItem.Size = New System.Drawing.Size(107, 22)
+        Me.AddToolStripMenuItem.Size = New System.Drawing.Size(142, 32)
         Me.AddToolStripMenuItem.Text = "Add"
         '
         'DeleteToolStripMenuItem
         '
         Me.DeleteToolStripMenuItem.Image = CType(resources.GetObject("DeleteToolStripMenuItem.Image"), System.Drawing.Image)
         Me.DeleteToolStripMenuItem.Name = "DeleteToolStripMenuItem"
-        Me.DeleteToolStripMenuItem.Size = New System.Drawing.Size(107, 22)
+        Me.DeleteToolStripMenuItem.Size = New System.Drawing.Size(142, 32)
         Me.DeleteToolStripMenuItem.Text = "Delete"
         '
         'SaveToolStripMenuItem
         '
         Me.SaveToolStripMenuItem.Image = CType(resources.GetObject("SaveToolStripMenuItem.Image"), System.Drawing.Image)
         Me.SaveToolStripMenuItem.Name = "SaveToolStripMenuItem"
-        Me.SaveToolStripMenuItem.Size = New System.Drawing.Size(107, 22)
+        Me.SaveToolStripMenuItem.Size = New System.Drawing.Size(142, 32)
         Me.SaveToolStripMenuItem.Text = "Save"
         '
         'PrintToolStripMenuItem
         '
         Me.PrintToolStripMenuItem.Image = CType(resources.GetObject("PrintToolStripMenuItem.Image"), System.Drawing.Image)
         Me.PrintToolStripMenuItem.Name = "PrintToolStripMenuItem"
-        Me.PrintToolStripMenuItem.Size = New System.Drawing.Size(107, 22)
+        Me.PrintToolStripMenuItem.Size = New System.Drawing.Size(142, 32)
         Me.PrintToolStripMenuItem.Text = "Print"
         '
         'SplitContainer1
         '
         Me.SplitContainer1.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.SplitContainer1.Location = New System.Drawing.Point(0, 57)
+        Me.SplitContainer1.Location = New System.Drawing.Point(0, 70)
         Me.SplitContainer1.Name = "SplitContainer1"
         '
         'SplitContainer1.Panel1
@@ -111,8 +113,8 @@ Partial Class RawFileEdit
         '
         Me.SplitContainer1.Panel2.Controls.Add(Me.RichTextBox1)
         Me.SplitContainer1.Panel2.Controls.Add(Me.pnlZPL)
-        Me.SplitContainer1.Size = New System.Drawing.Size(1157, 599)
-        Me.SplitContainer1.SplitterDistance = 258
+        Me.SplitContainer1.Size = New System.Drawing.Size(1348, 586)
+        Me.SplitContainer1.SplitterDistance = 300
         Me.SplitContainer1.SplitterWidth = 5
         Me.SplitContainer1.TabIndex = 7
         '
@@ -125,7 +127,7 @@ Partial Class RawFileEdit
         Me.TreeView1.Location = New System.Drawing.Point(0, 0)
         Me.TreeView1.Name = "TreeView1"
         Me.TreeView1.SelectedImageIndex = 0
-        Me.TreeView1.Size = New System.Drawing.Size(258, 599)
+        Me.TreeView1.Size = New System.Drawing.Size(300, 586)
         Me.TreeView1.TabIndex = 0
         '
         'ImageList1
@@ -139,6 +141,7 @@ Partial Class RawFileEdit
         '
         'pnlZPL
         '
+        Me.pnlZPL.Controls.Add(Me.Button2)
         Me.pnlZPL.Controls.Add(Me.Button1)
         Me.pnlZPL.Controls.Add(Me.ComboBox1)
         Me.pnlZPL.Controls.Add(Me.Label2)
@@ -149,9 +152,21 @@ Partial Class RawFileEdit
         Me.pnlZPL.Dock = System.Windows.Forms.DockStyle.Fill
         Me.pnlZPL.Location = New System.Drawing.Point(0, 0)
         Me.pnlZPL.Name = "pnlZPL"
-        Me.pnlZPL.Size = New System.Drawing.Size(894, 599)
+        Me.pnlZPL.Size = New System.Drawing.Size(1043, 586)
         Me.pnlZPL.TabIndex = 7
         Me.pnlZPL.Visible = False
+        '
+        'Button1
+        '
+        Me.Button1.Image = CType(resources.GetObject("Button1.Image"), System.Drawing.Image)
+        Me.Button1.ImageAlign = System.Drawing.ContentAlignment.TopCenter
+        Me.Button1.Location = New System.Drawing.Point(372, 3)
+        Me.Button1.Name = "Button1"
+        Me.Button1.Size = New System.Drawing.Size(75, 53)
+        Me.Button1.TabIndex = 14
+        Me.Button1.Text = "Rotate"
+        Me.Button1.TextAlign = System.Drawing.ContentAlignment.BottomCenter
+        Me.Button1.UseVisualStyleBackColor = True
         '
         'ComboBox1
         '
@@ -160,7 +175,7 @@ Partial Class RawFileEdit
         Me.ComboBox1.Items.AddRange(New Object() {"6 dpmm (152 dpi)", "8 dpmm (203 dpi)", "12 dpmm (300 dpi)", "24 dpmm (600 dpi)"})
         Me.ComboBox1.Location = New System.Drawing.Point(636, 12)
         Me.ComboBox1.Name = "ComboBox1"
-        Me.ComboBox1.Size = New System.Drawing.Size(188, 21)
+        Me.ComboBox1.Size = New System.Drawing.Size(188, 28)
         Me.ComboBox1.TabIndex = 13
         '
         'Label2
@@ -168,7 +183,7 @@ Partial Class RawFileEdit
         Me.Label2.AutoSize = True
         Me.Label2.Location = New System.Drawing.Point(569, 15)
         Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(14, 13)
+        Me.Label2.Size = New System.Drawing.Size(19, 20)
         Me.Label2.TabIndex = 12
         Me.Label2.Text = "x"
         '
@@ -176,7 +191,7 @@ Partial Class RawFileEdit
         '
         Me.TextBox2.Location = New System.Drawing.Point(589, 12)
         Me.TextBox2.Name = "TextBox2"
-        Me.TextBox2.Size = New System.Drawing.Size(41, 21)
+        Me.TextBox2.Size = New System.Drawing.Size(41, 28)
         Me.TextBox2.TabIndex = 11
         Me.TextBox2.Text = "6"
         '
@@ -185,7 +200,7 @@ Partial Class RawFileEdit
         Me.Label1.AutoSize = True
         Me.Label1.Location = New System.Drawing.Point(452, 12)
         Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(70, 13)
+        Me.Label1.Size = New System.Drawing.Size(104, 20)
         Me.Label1.TabIndex = 10
         Me.Label1.Text = "Label Size:"
         '
@@ -193,7 +208,7 @@ Partial Class RawFileEdit
         '
         Me.TextBox1.Location = New System.Drawing.Point(528, 12)
         Me.TextBox1.Name = "TextBox1"
-        Me.TextBox1.Size = New System.Drawing.Size(35, 21)
+        Me.TextBox1.Size = New System.Drawing.Size(35, 28)
         Me.TextBox1.TabIndex = 9
         Me.TextBox1.Text = "4"
         '
@@ -216,7 +231,7 @@ Partial Class RawFileEdit
         Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.cmdAdd, Me.cmdDelete, Me.cmdSave, Me.cmdPrint})
         Me.ToolStrip1.Location = New System.Drawing.Point(0, 0)
         Me.ToolStrip1.Name = "ToolStrip1"
-        Me.ToolStrip1.Size = New System.Drawing.Size(1157, 57)
+        Me.ToolStrip1.Size = New System.Drawing.Size(1348, 70)
         Me.ToolStrip1.TabIndex = 8
         Me.ToolStrip1.Text = "ToolStrip1"
         '
@@ -226,7 +241,7 @@ Partial Class RawFileEdit
         Me.cmdAdd.Image = CType(resources.GetObject("cmdAdd.Image"), System.Drawing.Image)
         Me.cmdAdd.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.cmdAdd.Name = "cmdAdd"
-        Me.cmdAdd.Size = New System.Drawing.Size(43, 54)
+        Me.cmdAdd.Size = New System.Drawing.Size(63, 65)
         Me.cmdAdd.Text = "Add"
         Me.cmdAdd.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText
         '
@@ -236,7 +251,7 @@ Partial Class RawFileEdit
         Me.cmdDelete.Image = CType(resources.GetObject("cmdDelete.Image"), System.Drawing.Image)
         Me.cmdDelete.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.cmdDelete.Name = "cmdDelete"
-        Me.cmdDelete.Size = New System.Drawing.Size(66, 54)
+        Me.cmdDelete.Size = New System.Drawing.Size(93, 65)
         Me.cmdDelete.Text = "Delete"
         Me.cmdDelete.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText
         '
@@ -246,7 +261,7 @@ Partial Class RawFileEdit
         Me.cmdSave.Image = CType(resources.GetObject("cmdSave.Image"), System.Drawing.Image)
         Me.cmdSave.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.cmdSave.Name = "cmdSave"
-        Me.cmdSave.Size = New System.Drawing.Size(51, 54)
+        Me.cmdSave.Size = New System.Drawing.Size(75, 65)
         Me.cmdSave.Text = "Save"
         Me.cmdSave.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText
         '
@@ -256,27 +271,24 @@ Partial Class RawFileEdit
         Me.cmdPrint.Image = CType(resources.GetObject("cmdPrint.Image"), System.Drawing.Image)
         Me.cmdPrint.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.cmdPrint.Name = "cmdPrint"
-        Me.cmdPrint.Size = New System.Drawing.Size(50, 54)
+        Me.cmdPrint.Size = New System.Drawing.Size(71, 65)
         Me.cmdPrint.Text = "Print"
         Me.cmdPrint.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText
         '
-        'Button1
+        'Button2
         '
-        Me.Button1.Image = CType(resources.GetObject("Button1.Image"), System.Drawing.Image)
-        Me.Button1.ImageAlign = System.Drawing.ContentAlignment.TopCenter
-        Me.Button1.Location = New System.Drawing.Point(372, 3)
-        Me.Button1.Name = "Button1"
-        Me.Button1.Size = New System.Drawing.Size(75, 53)
-        Me.Button1.TabIndex = 14
-        Me.Button1.Text = "Rotate"
-        Me.Button1.TextAlign = System.Drawing.ContentAlignment.BottomCenter
-        Me.Button1.UseVisualStyleBackColor = True
-        Me.Button1.Visible = False
+        Me.Button2.ImageAlign = System.Drawing.ContentAlignment.TopCenter
+        Me.Button2.Location = New System.Drawing.Point(931, 3)
+        Me.Button2.Name = "Button2"
+        Me.Button2.Size = New System.Drawing.Size(100, 53)
+        Me.Button2.TabIndex = 15
+        Me.Button2.Text = "Add Variables"
+        Me.Button2.UseVisualStyleBackColor = True
         '
         'RawFileEdit
         '
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None
-        Me.ClientSize = New System.Drawing.Size(1157, 656)
+        Me.ClientSize = New System.Drawing.Size(1348, 656)
         Me.Controls.Add(Me.SplitContainer1)
         Me.Controls.Add(Me.ToolStrip1)
         Me.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
@@ -320,4 +332,5 @@ Partial Class RawFileEdit
     Friend WithEvents Label2 As Label
     Friend WithEvents TextBox2 As TextBox
     Friend WithEvents Button1 As Button
+    Friend WithEvents Button2 As Button
 End Class

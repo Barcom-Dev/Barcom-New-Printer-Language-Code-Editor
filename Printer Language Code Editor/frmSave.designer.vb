@@ -22,54 +22,61 @@ Partial Class frmSave
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.components = New System.ComponentModel.Container
+        Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmSave))
-        Me.txtReportName = New System.Windows.Forms.TextBox
-        Me.cboReportCategory = New System.Windows.Forms.ComboBox
-        Me.Label1 = New System.Windows.Forms.Label
-        Me.Label2 = New System.Windows.Forms.Label
-        Me.cmdOK = New System.Windows.Forms.Button
-        Me.cmdCancel = New System.Windows.Forms.Button
-        Me.lblMessage = New System.Windows.Forms.Label
+        Me.txtReportName = New System.Windows.Forms.TextBox()
+        Me.cboReportCategory = New System.Windows.Forms.ComboBox()
+        Me.Label1 = New System.Windows.Forms.Label()
+        Me.Label2 = New System.Windows.Forms.Label()
+        Me.cmdOK = New System.Windows.Forms.Button()
+        Me.cmdCancel = New System.Windows.Forms.Button()
+        Me.lblMessage = New System.Windows.Forms.Label()
         Me.Timer1 = New System.Windows.Forms.Timer(Me.components)
         Me.SuspendLayout()
         '
         'txtReportName
         '
-        Me.txtReportName.Location = New System.Drawing.Point(50, 147)
+        Me.txtReportName.Font = New System.Drawing.Font("Tahoma", 12.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.txtReportName.Location = New System.Drawing.Point(51, 147)
         Me.txtReportName.Name = "txtReportName"
-        Me.txtReportName.Size = New System.Drawing.Size(267, 21)
+        Me.txtReportName.Size = New System.Drawing.Size(267, 27)
         Me.txtReportName.TabIndex = 1
         '
         'cboReportCategory
         '
+        Me.cboReportCategory.Font = New System.Drawing.Font("Tahoma", 12.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.cboReportCategory.FormattingEnabled = True
-        Me.cboReportCategory.Location = New System.Drawing.Point(50, 98)
+        Me.cboReportCategory.Location = New System.Drawing.Point(51, 83)
         Me.cboReportCategory.Name = "cboReportCategory"
-        Me.cboReportCategory.Size = New System.Drawing.Size(121, 21)
+        Me.cboReportCategory.Size = New System.Drawing.Size(189, 27)
         Me.cboReportCategory.TabIndex = 0
         '
         'Label1
         '
         Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(47, 82)
+        Me.Label1.Font = New System.Drawing.Font("Tahoma", 12.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label1.ForeColor = System.Drawing.Color.FromArgb(CType(CType(44, Byte), Integer), CType(CType(82, Byte), Integer), CType(CType(139, Byte), Integer))
+        Me.Label1.Location = New System.Drawing.Point(46, 56)
         Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(88, 13)
+        Me.Label1.Size = New System.Drawing.Size(144, 19)
         Me.Label1.TabIndex = 2
         Me.Label1.Text = "Report Category"
         '
         'Label2
         '
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(47, 131)
+        Me.Label2.Font = New System.Drawing.Font("Tahoma", 12.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label2.ForeColor = System.Drawing.Color.FromArgb(CType(CType(44, Byte), Integer), CType(CType(82, Byte), Integer), CType(CType(139, Byte), Integer))
+        Me.Label2.Location = New System.Drawing.Point(47, 120)
         Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(70, 13)
+        Me.Label2.Size = New System.Drawing.Size(117, 19)
         Me.Label2.TabIndex = 3
         Me.Label2.Text = "Report Name"
         '
         'cmdOK
         '
         Me.cmdOK.DialogResult = System.Windows.Forms.DialogResult.OK
+        Me.cmdOK.Font = New System.Drawing.Font("Tahoma", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.cmdOK.Location = New System.Drawing.Point(356, 72)
         Me.cmdOK.Name = "cmdOK"
         Me.cmdOK.Size = New System.Drawing.Size(104, 40)
@@ -80,6 +87,7 @@ Partial Class frmSave
         'cmdCancel
         '
         Me.cmdCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.cmdCancel.Font = New System.Drawing.Font("Tahoma", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.cmdCancel.Location = New System.Drawing.Point(356, 128)
         Me.cmdCancel.Name = "cmdCancel"
         Me.cmdCancel.Size = New System.Drawing.Size(104, 40)
@@ -90,9 +98,11 @@ Partial Class frmSave
         'lblMessage
         '
         Me.lblMessage.AutoSize = True
-        Me.lblMessage.Location = New System.Drawing.Point(47, 40)
+        Me.lblMessage.Font = New System.Drawing.Font("Tahoma", 12.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblMessage.ForeColor = System.Drawing.Color.FromArgb(CType(CType(44, Byte), Integer), CType(CType(82, Byte), Integer), CType(CType(139, Byte), Integer))
+        Me.lblMessage.Location = New System.Drawing.Point(24, 9)
         Me.lblMessage.Name = "lblMessage"
-        Me.lblMessage.Size = New System.Drawing.Size(99, 13)
+        Me.lblMessage.Size = New System.Drawing.Size(167, 19)
         Me.lblMessage.TabIndex = 6
         Me.lblMessage.Text = "Report Information"
         '

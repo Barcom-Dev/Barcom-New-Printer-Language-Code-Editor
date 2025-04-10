@@ -18,6 +18,7 @@ Public Class RawFileEdit
     Private _UserCode As String = "bhamer"
     Private _ConnectionString As String = "User ID=sa;Password=waves428&Blanket;Initial Catalog=barcomdemo;Data Source=SQL.EBARCOM.COM,9876"
     Dim boolStartup As Boolean = True
+    Dim boolLabelChange As Boolean = False
     'Private _ConnectionString As String = "User ID=AUTOSEQUENCE;Password=AUTOSEQUENCE;Initial Catalog=AUTOSEQUENCE;Data Source=10.113.14.9,8484"
     Property ProgramOption() As Int32
         Get
@@ -332,8 +333,8 @@ Public Class RawFileEdit
     ' Add a variable to track the current rotation angle
     Private _currentRotationAngle As Integer = 0
 
-    Private Sub TreeView1_AfterSelect(ByVal sender As Object, ByVal e As System.Windows.Forms.TreeViewEventArgs) Handles TreeView1.AfterSelect
-        Dim mn As TreeNode = e.Node
+    Sub DrawZPLLabel()
+        Dim mn As TreeNode = TreeView1.SelectedNode
         If mn.Level <> 0 Then
             ' Reset the rotation angle when a new label is selected
             _currentRotationAngle = 0
@@ -374,6 +375,26 @@ Public Class RawFileEdit
                 cmd.Dispose()
                 cmd = Nothing
             End Try
+        End If
+    End Sub
+
+
+    Private Sub TreeView1_AfterSelect(ByVal sender As Object, ByVal e As System.Windows.Forms.TreeViewEventArgs) Handles TreeView1.AfterSelect
+        lblSelected.Text = e.Node.Text
+        DrawZPLLabel()
+    End Sub
+    Private Sub TreeView1_BeforeSelect(sender As Object, e As TreeViewCancelEventArgs) Handles TreeView1.BeforeSelect
+        If boolLabelChange = True Then
+            Select Case MessageBox.Show("You made a Change to this template do you want to Save?", "Save Changes", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question)
+                Case DialogResult.Yes
+                    SaveToolStripMenuItem_Click(Nothing, Nothing)
+                    boolLabelChange = False
+                Case DialogResult.No
+                    e.Cancel = True
+                    Return
+                Case DialogResult.Cancel
+
+            End Select
         End If
     End Sub
 
@@ -436,6 +457,7 @@ Public Class RawFileEdit
     End Sub
 
     Private Sub cmdSave_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdSave.Click
+        boolLabelChange = False
         SaveToolStripMenuItem_Click(Nothing, Nothing)
     End Sub
 
@@ -542,7 +564,8 @@ Public Class RawFileEdit
         End If
     End Sub
 
-    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+
+    Private Sub ToolStripButton1_Click(sender As Object, e As EventArgs) Handles ToolStripButton1.Click
         Try
             ' Check if there's an image to rotate
             If PictureBox1.Image Is Nothing Then
@@ -565,8 +588,7 @@ Public Class RawFileEdit
         End Try
     End Sub
 
-
-    Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
+    Private Sub ToolStripButton2_Click(sender As Object, e As EventArgs) Handles ToolStripButton2.Click
         ' Check if there's ZPL code to process
         If String.IsNullOrWhiteSpace(RichTextBox1.Text) Then
             MessageBox.Show("Please enter ZPL code first.")
@@ -681,5 +703,87 @@ Public Class RawFileEdit
             ' Redraw the label with the new ZPL, which will also apply existing rotation
             DrawLabel()
         End If
+    End Sub
+    Private Sub RichTextBox1_KeyDown(sender As Object, e As KeyEventArgs) Handles RichTextBox1.KeyDown
+        If e.KeyCode = Keys.C AndAlso e.Control Then
+            boolLabelChange = False
+            Exit Sub
+        End If
+        If e.KeyValue >= 32 And e.KeyValue <= 126 Then
+            If RichTextBox1.Text.StartsWith("^XA") Then
+                pnlZPL.Visible = True
+                DrawLabel()
+                SizeBox()
+                RichTextBox1.Dock = DockStyle.Left
+                boolLabelChange = True
+            End If
+        End If
+
+    End Sub
+
+
+    Private Sub ToolStripButton3_Click(sender As Object, e As EventArgs) Handles ToolStripButton3.Click
+        Try
+            RichTextBox1.Text = ""
+            Dim fu As New frmSave
+            fu.ConnectionString = _ConnectionString
+            fu.ShowDialog()
+
+            If fu.DialogResult = Windows.Forms.DialogResult.Cancel Then
+                Exit Sub
+            End If
+            Dim strLabelName As String = fu.txtReportName.Text
+            Dim strLabelType As String = fu.cboReportCategory.Text
+            If doesExist(strLabelName) Then
+                MessageBox.Show("Report " & strLabelName & "already exist. Please Choose another Name.")
+                fu.ShowDialog()
+            End If
+            If strLabelName = "" Then
+                Exit Sub
+            End If
+
+
+            Dim Conn As New SqlClient.SqlConnection(_ConnectionString)
+            Dim cmd As SqlClient.SqlCommand = Nothing
+            Try
+                Conn.Open()
+                cmd = New SqlClient.SqlCommand
+                cmd.CommandType = CommandType.Text
+                cmd.CommandText = "INSERT INTO Reports(ReportDescription, REPORTFILE,REPORTPROGRAM,REPORTTYPE) VALUES (@LABELNAME, @LABELCONTENT,'RAWTEXT',@REPORTTYPE)"
+                cmd.Parameters.AddWithValue("@LABELNAME", strLabelName)
+                cmd.Parameters.AddWithValue("@REPORTTYPE", strLabelType)
+                Dim strLABELCONTENTS As String = RichTextBox1.Text
+                Dim b As Byte() = Encoding.Unicode.GetBytes(strLABELCONTENTS)
+                cmd.Parameters.AddWithValue("@LabelContent", b)
+                cmd.Connection = Conn
+                cmd.ExecuteNonQuery()
+                CheckforNodeExistence(strLabelType)
+                TreeView1.Nodes(strLabelType).Nodes.Add(strLabelName, strLabelName, 0, 0)
+                TreeView1.SelectedNode = TreeView1.Nodes(strLabelType).Nodes(strLabelName)
+                _currentparent = strLabelType
+                _currentLabel = strLabelName
+
+            Catch ex As SqlClient.SqlException
+
+            Catch ex As Exception
+
+            Finally
+                If Conn.State = ConnectionState.Open Then
+                    Conn.Close()
+                    Conn.Dispose()
+                    Conn = Nothing
+                End If
+                cmd.Dispose()
+                cmd = Nothing
+            End Try
+
+            'Dim strFileName As String = InputBox("What do you want to call this file?", "File Name", "ZPL")
+            'If strFileName = "" Then
+            '    Exit Sub
+            'End If
+
+        Catch ex As Exception
+
+        End Try
     End Sub
 End Class

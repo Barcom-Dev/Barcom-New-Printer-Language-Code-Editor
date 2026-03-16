@@ -4,13 +4,11 @@ Imports System.Text
 
 Public Class RawFileEdit
     Inherits WeifenLuo.WinFormsUI.DockContent
-
+    Private _ZplConverter As New ZPLConverter()
     Private _ProgramOptionsTable As DataTable
     Private _ProgramOption As Int32
     Private _AvailableTask As New Specialized.StringCollection
     Private _AvailableOptions As Specialized.StringCollection
-
-
 
     'Private _connectionstring As String = My.Settings.ConnectionStirng
     Dim _currentLabel As String = ""
@@ -66,8 +64,9 @@ Public Class RawFileEdit
     End Property
     Private Sub Form1_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         Loaditup()
-        ComboBox1.SelectedIndex = 1
-
+        DensityComboBox.SelectedIndex = 1
+        ImagingModeComboBox.SelectedIndex = 0
+        UnitComboBox.SelectedIndex = 0
     End Sub
     Sub LoadFiles()
         Try
@@ -80,7 +79,7 @@ Public Class RawFileEdit
 
             Dim i As Int32 = 0
             For i = 0 To TreeView1.Nodes.Count - 1
-                cmd.CommandText = "Select REportDescription from Reports where ReportType = '" & TreeView1.Nodes(i).Text & "' and ReportProgram = 'RAWTEXT'"
+                cmd.CommandText = "Select ReportDescription from Reports where ReportType = '" & TreeView1.Nodes(i).Text & "' and ReportProgram = 'RAWTEXT'"
                 Dim dr As SqlClient.SqlDataReader = cmd.ExecuteReader
                 While dr.Read
                     'do stuff here
@@ -137,6 +136,7 @@ Public Class RawFileEdit
         Dim cmd As SqlClient.SqlCommand = Nothing
         Try
             If TreeView1.SelectedNode.Level = 0 Then
+                MessageBox.Show("Please select a label to save")
                 Exit Sub
             End If
             If MessageBox.Show("Are you Sure you want to Save the Label:" & _currentLabel, "", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = Windows.Forms.DialogResult.No Then
@@ -148,7 +148,7 @@ Public Class RawFileEdit
             cmd.CommandType = CommandType.Text
             cmd.CommandText = "Update Reports Set ReportFile = @LabelContent Where REPORTDESCRIPTION = '" & _currentLabel & "'"
 
-            Dim b As Byte() = Encoding.Unicode.GetBytes(RichTextBox1.Text)
+            Dim b As Byte() = Encoding.Unicode.GetBytes(RawZPLText.Text)
             cmd.Parameters.AddWithValue("@LabelContent", b)
 
             cmd.Connection = Conn
@@ -163,8 +163,6 @@ Public Class RawFileEdit
                 Conn.Dispose()
                 Conn = Nothing
             End If
-            '     cmd.Dispose()
-            '     cmd = Nothing
         End Try
 
     End Sub
@@ -199,8 +197,6 @@ Public Class RawFileEdit
                 Conn.Dispose()
                 Conn = Nothing
             End If
-            '             cmd.Dispose()
-            '             cmd = Nothing
         End Try
     End Sub
     Function doesExist(ByVal strDESCRIPTION As String) As Boolean
@@ -338,7 +334,7 @@ Public Class RawFileEdit
         If mn.Level <> 0 Then
             ' Reset the rotation angle when a new label is selected
             _currentRotationAngle = 0
-            PictureBox1.Image = Nothing ' Clear the previous image
+            PreviewPictureBox.Image = Nothing ' Clear the previous image
             Dim result As Object
             Dim Conn As New SqlClient.SqlConnection(_ConnectionString)
             Dim cmd As SqlClient.SqlCommand = Nothing
@@ -352,15 +348,16 @@ Public Class RawFileEdit
                 cmd.Connection = Conn
                 result = cmd.ExecuteScalar
                 Dim strModified As String = System.Text.Encoding.Unicode.GetString(result)
-                RichTextBox1.Text = strModified
-                If RichTextBox1.Text.StartsWith("^XA") Then
-                    pnlZPL.Visible = True
+                boolLabelChange = False
+                boolStartup = True
+                RawZPLText.Text = strModified
+                boolStartup = False
+                If RawZPLText.Text.StartsWith("^XA") Then
                     DrawLabel()
                     SizeBox()
-                    RichTextBox1.Dock = DockStyle.Left
+                    ' RawZPLText.Dock = DockStyle.Left
                 Else
-                    RichTextBox1.Dock = DockStyle.Fill
-                    pnlZPL.Visible = False
+                    ' RawZPLText.Dock = DockStyle.Fill
                 End If
             Catch ex As SqlClient.SqlException
                 MsgBox(ex.ToString)
@@ -376,124 +373,131 @@ Public Class RawFileEdit
                 cmd = Nothing
             End Try
         End If
+
     End Sub
 
 
     Private Sub TreeView1_AfterSelect(ByVal sender As Object, ByVal e As System.Windows.Forms.TreeViewEventArgs) Handles TreeView1.AfterSelect
         lblSelected.Text = e.Node.Text
-        DrawZPLLabel()
-    End Sub
-    Private Sub TreeView1_BeforeSelect(sender As Object, e As TreeViewCancelEventArgs) Handles TreeView1.BeforeSelect
-        If boolLabelChange = True Then
-            Select Case MessageBox.Show("You made a Change to this template do you want to Save?", "Save Changes", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question)
-                Case DialogResult.Yes
-                    SaveToolStripMenuItem_Click(Nothing, Nothing)
-                    boolLabelChange = False
-                Case DialogResult.No
-                    e.Cancel = True
-                    Return
-                Case DialogResult.Cancel
-
-            End Select
+        Dim mn As TreeNode = TreeView1.SelectedNode
+        If mn.Level <> 0 Then
+            pnlZPL.Visible = True
+            DrawZPLLabel()
+        Else
+            boolLabelChange = False
+            boolStartup = True
+            RawZPLText.Text = ""
+            pnlZPL.Visible = False
         End If
+    End Sub
+
+    Private Sub MarkNodeAsChanged(node As TreeNode)
+        Dim nodeText As String = node.Text.Clone()
+        Dim nodeFont As Font = node.NodeFont
+        If nodeFont Is Nothing OrElse nodeFont.Style <> FontStyle.Bold Then
+            nodeFont = New Font(TreeView1.Font, FontStyle.Bold)
+        End If
+        node.NodeFont = nodeFont
+        node.Text = nodeText
+    End Sub
+
+    Private Sub UnmarkNodeAsChanged(node As TreeNode)
+        node.NodeFont = Nothing
+    End Sub
+
+    Private Sub TreeView1_BeforeSelect(sender As Object, e As TreeViewCancelEventArgs) Handles TreeView1.BeforeSelect
+        If Not boolLabelChange Then
+            Return
+        End If
+        Select Case MessageBox.Show($"{_currentLabel} has unsaved changes. Do you want to Save before proceeding?", "Save Changes", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question)
+            Case DialogResult.Yes
+                SaveToolStripMenuItem_Click(Nothing, Nothing)
+                boolLabelChange = False
+                UnmarkNodeAsChanged(TreeView1.SelectedNode)
+            Case DialogResult.No
+                boolLabelChange = False
+                UnmarkNodeAsChanged(TreeView1.SelectedNode)
+                Return
+            Case DialogResult.Cancel
+                e.Cancel = True
+        End Select
     End Sub
 
     Sub SizeBox()
         Try
-            ' Check if textboxes have values before proceeding
-            If String.IsNullOrWhiteSpace(TextBox1.Text) OrElse String.IsNullOrWhiteSpace(TextBox2.Text) Then
+            Dim widthInches As Single, heightInches As Single
+            If Not GetLabelSizeInInches(widthInches, heightInches) Then
                 Exit Sub
             End If
 
-            Dim width As Double
-            Dim height As Double
+            ' Get screen DPI
+            Dim graphics As Graphics = Me.CreateGraphics()
+            Dim dpiX As Single = graphics.DpiX
+            Dim dpiY As Single = graphics.DpiY
+            graphics.Dispose()
 
-            If Double.TryParse(TextBox1.Text, width) AndAlso Double.TryParse(TextBox2.Text, height) Then
-                ' Get screen DPI
-                Dim graphics As Graphics = Me.CreateGraphics()
-                Dim dpiX As Single = graphics.DpiX
-                Dim dpiY As Single = graphics.DpiY
-                graphics.Dispose()
+            ' Convert inches to pixels - consider the current rotation
+            Dim widthInPixels As Integer
+            Dim heightInPixels As Integer
 
-                ' Convert inches to pixels - consider the current rotation
-                Dim widthInPixels As Integer
-                Dim heightInPixels As Integer
-
-                If _currentRotationAngle = 90 OrElse _currentRotationAngle = 270 Then
-                    ' Swap dimensions for 90/270 degree rotations
-                    widthInPixels = CInt(height * dpiX)
-                    heightInPixels = CInt(width * dpiY)
-                Else
-                    ' Normal orientation for 0/180 degrees
-                    widthInPixels = CInt(width * dpiX)
-                    heightInPixels = CInt(height * dpiY)
-                End If
-
-                ' Set the PictureBox size
-                PictureBox1.Size = New Size(widthInPixels, heightInPixels)
-
-                ' Set to Normal (not Zoom) to preserve actual size of content
-                PictureBox1.SizeMode = PictureBoxSizeMode.Normal
+            If _currentRotationAngle = 90 OrElse _currentRotationAngle = 270 Then
+                widthInPixels = CInt(heightInches * dpiX)
+                heightInPixels = CInt(widthInches * dpiY)
+            Else
+                widthInPixels = CInt(widthInches * dpiX)
+                heightInPixels = CInt(heightInches * dpiY)
             End If
+
+            ' Set the PictureBox size (used when no image yet; ConvertZPLToImage2/RotateLabel set final size)
+            PreviewPictureBox.Size = New Size(widthInPixels, heightInPixels)
+            PreviewPictureBox.SizeMode = PictureBoxSizeMode.Normal
         Catch ex As Exception
             Debug.WriteLine($"Error in SizeBox: {ex.Message}")
         End Try
     End Sub
 
-    Private Sub PrintToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles PrintToolStripMenuItem.Click
-        Dim pc As New PrintDialog
-        If pc.ShowDialog() = Windows.Forms.DialogResult.OK Then
-            Printerout.SendStringToPrinter(pc.PrinterSettings.PrinterName, RichTextBox1.Text)
-        End If
-
-    End Sub
-
-    Private Sub cmdAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdAdd.Click
+    Private Sub OnClickAddFromFile(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles AddFromFileToolStripButton.Click
         AddToolStripMenuItem_Click(Nothing, Nothing)
     End Sub
 
-    Private Sub cmdDelete_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdDelete.Click
+    Private Sub OnClickDelete(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles DeleteToolStripButton.Click
         DeleteToolStripMenuItem_Click(Nothing, Nothing)
     End Sub
 
-    Private Sub cmdSave_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdSave.Click
+    Private Sub OnClickSave(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles SaveToolStripButton.Click
         boolLabelChange = False
         SaveToolStripMenuItem_Click(Nothing, Nothing)
     End Sub
 
-    Private Sub cmdPrint_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdPrint.Click
+    Private Sub OnClickPrint(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles PrintToolStripButton.Click
         Dim pc As New PrintDialog
         If pc.ShowDialog() = Windows.Forms.DialogResult.OK Then
-            Printerout.SendStringToPrinter(pc.PrinterSettings.PrinterName, RichTextBox1.Text)
+            Printerout.SendStringToPrinter(pc.PrinterSettings.PrinterName, RawZPLText.Text)
         End If
 
     End Sub
 
     Sub DrawLabel()
         Try
-            ' Validate inputs first
-            If String.IsNullOrWhiteSpace(TextBox1.Text) OrElse String.IsNullOrWhiteSpace(TextBox2.Text) Then
+            Dim widthInches As Single, heightInches As Single
+            If Not GetLabelSizeInInches(widthInches, heightInches) Then
                 MessageBox.Show("Please enter valid width and height values")
                 Exit Sub
             End If
 
-            ' Size the PictureBox first - this will set the correct size based on TextBox values
+            ' Size the PictureBox first (for initial layout before image loads)
             SizeBox()
 
-            ' Only proceed if we have ZPL code
-            If String.IsNullOrWhiteSpace(RichTextBox1.Text) Then
+            If String.IsNullOrWhiteSpace(RawZPLText.Text) Then
                 MessageBox.Show("Please enter ZPL code")
                 Exit Sub
             End If
 
-            ' Get the selected DPM value from ComboBox1
-            Dim selectedDPM As String = If(ComboBox1.SelectedItem IsNot Nothing, ComboBox1.SelectedItem.ToString(), "8 dpmm (203 dpi)")
+            Dim selectedDPM As String = If(DensityComboBox.SelectedItem IsNot Nothing, DensityComboBox.SelectedItem.ToString(), "8 dpmm (203 dpi)")
+            Dim sizeInInches As String = widthInches.ToString() & "x" & heightInches.ToString()
 
-            ' Generate the label with the scaling factor that works (0.47)
-            Dim mZPL As New ZPLConverter()
-            mZPL.ConvertZPLToImage(RichTextBox1.Text, TextBox1.Text & "x" & TextBox2.Text, PictureBox1, selectedDPM)
+            _ZplConverter.ConvertZPLToImage2(RawZPLText.Text, sizeInInches, PreviewPictureBox, selectedDPM)
 
-            ' Apply the current rotation to the newly generated image
             If _currentRotationAngle > 0 Then
                 RotateLabel(_currentRotationAngle)
             End If
@@ -501,62 +505,35 @@ Public Class RawFileEdit
             MsgBox(ex.ToString)
         End Try
     End Sub
+
     Private Sub RotateLabel(ByVal angle As Integer)
-        If PictureBox1.Image IsNot Nothing Then
-            Dim originalImage As Bitmap = New Bitmap(PictureBox1.Image)
-            Dim oldImage As Image = PictureBox1.Image
+        If PreviewPictureBox.Image Is Nothing Then Return
 
-            ' Apply the rotation directly based on the absolute angle value
-            Select Case angle
-                Case 90
-                    originalImage.RotateFlip(RotateFlipType.Rotate90FlipNone)
-                Case 180
-                    originalImage.RotateFlip(RotateFlipType.Rotate180FlipNone)
-                Case 270
-                    originalImage.RotateFlip(RotateFlipType.Rotate270FlipNone)
-                Case Else ' 0 degrees
-                    ' No rotation needed
-            End Select
+        Dim originalImage As Bitmap = New Bitmap(PreviewPictureBox.Image)
+        Dim oldImage As Image = PreviewPictureBox.Image
 
-            PictureBox1.Image = originalImage
+        Select Case angle
+            Case 90
+                originalImage.RotateFlip(RotateFlipType.Rotate90FlipNone)
+            Case 180
+                originalImage.RotateFlip(RotateFlipType.Rotate180FlipNone)
+            Case 270
+                originalImage.RotateFlip(RotateFlipType.Rotate270FlipNone)
+        End Select
 
-            ' Adjust the PictureBox size according to rotation but keep the label dimensions as displayed in TextBoxes
-            If angle = 90 OrElse angle = 270 Then
-                ' For 90 or 270-degree rotations, swap width/height of PictureBox but NOT the TextBox values
-                Dim width As Double
-                Dim height As Double
+        PreviewPictureBox.Image = originalImage
 
-                If Double.TryParse(TextBox1.Text, width) AndAlso Double.TryParse(TextBox2.Text, height) Then
-                    ' Get screen DPI
-                    Dim graphics As Graphics = Me.CreateGraphics()
-                    Dim dpiX As Single = graphics.DpiX
-                    Dim dpiY As Single = graphics.DpiY
-                    graphics.Dispose()
+        ' Swap PictureBox dimensions for 90/270 so display matches rotated image
+        If angle = 90 OrElse angle = 270 Then
+            PreviewPictureBox.Size = New Size(PreviewPictureBox.Height, PreviewPictureBox.Width)
+        End If
 
-                    ' For rotated view, swap the dimensions for the PictureBox only
-                    Dim widthInPixels As Integer = CInt(height * dpiX)
-                    Dim heightInPixels As Integer = CInt(width * dpiY)
-
-                    ' Set the PictureBox size
-                    PictureBox1.Size = New Size(widthInPixels, heightInPixels)
-                End If
-            End If
-
-            If oldImage IsNot Nothing AndAlso oldImage IsNot originalImage Then
-                oldImage.Dispose()
-            End If
+        If oldImage IsNot Nothing AndAlso oldImage IsNot originalImage Then
+            oldImage.Dispose()
         End If
     End Sub
 
-    Private Sub TextBox1_TextChanged(sender As Object, e As EventArgs) Handles TextBox1.TextChanged, TextBox2.TextChanged
-        SizeBox()
-    End Sub
-
-    Private Sub RawFileEdit_ImeModeChanged(sender As Object, e As EventArgs) Handles Me.ImeModeChanged
-
-    End Sub
-
-    Private Sub ComboBox1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBox1.SelectedIndexChanged
+    Private Sub OnDensityChanged(sender As Object, e As EventArgs) Handles DensityComboBox.SelectedIndexChanged
         If boolStartup = False Then
             DrawLabel()
         Else
@@ -564,11 +541,21 @@ Public Class RawFileEdit
         End If
     End Sub
 
+    Private Sub OnUnitChanged(sender As Object, e As EventArgs) Handles UnitComboBox.SelectedIndexChanged
+        If boolStartup = False AndAlso RawZPLText.Text.StartsWith("^XA") Then
+            DrawLabel()
+        End If
+    End Sub
 
-    Private Sub ToolStripButton1_Click(sender As Object, e As EventArgs) Handles ToolStripButton1.Click
+
+    Private Sub OnClickRotateToolStripButton(sender As Object, e As EventArgs) Handles RotateToolStripButton.Click
         Try
             ' Check if there's an image to rotate
-            If PictureBox1.Image Is Nothing Then
+            If PreviewPictureBox.Image Is Nothing Then
+                Return
+            End If
+
+            If TreeView1.SelectedNode Is Nothing OrElse TreeView1.SelectedNode.Level = 0 Then
                 Return
             End If
 
@@ -576,27 +563,27 @@ Public Class RawFileEdit
             _currentRotationAngle = (_currentRotationAngle + 90) Mod 360
 
             ' Store the current ZPL code
-            Dim currentZPL As String = RichTextBox1.Text
+            Dim currentZPL As String = RawZPLText.Text
 
             ' Redraw the label with the current ZPL code
             DrawLabel()
 
             ' Refresh the PictureBox
-            PictureBox1.Refresh()
+            PreviewPictureBox.Refresh()
         Catch ex As Exception
             MessageBox.Show($"Error rotating image: {ex.Message}")
         End Try
     End Sub
 
-    Private Sub ToolStripButton2_Click(sender As Object, e As EventArgs) Handles ToolStripButton2.Click
+    Private Sub ToolStripButton2_Click(sender As Object, e As EventArgs) Handles FillVariablesToolStripButton.Click
         ' Check if there's ZPL code to process
-        If String.IsNullOrWhiteSpace(RichTextBox1.Text) Then
+        If String.IsNullOrWhiteSpace(RawZPLText.Text) Then
             MessageBox.Show("Please enter ZPL code first.")
             Return
         End If
 
         ' Find all XB variables in the ZPL code
-        Dim zplCode As String = RichTextBox1.Text
+        Dim zplCode As String = RawZPLText.Text
         Dim regex As New System.Text.RegularExpressions.Regex("XB[A-Z0-9]+")
         Dim matches As System.Text.RegularExpressions.MatchCollection = regex.Matches(zplCode)
 
@@ -698,33 +685,35 @@ Public Class RawFileEdit
             Next
 
             ' Update the ZPL code
-            RichTextBox1.Text = newZPL
+            RawZPLText.Text = newZPL
 
             ' Redraw the label with the new ZPL, which will also apply existing rotation
             DrawLabel()
         End If
     End Sub
-    Private Sub RichTextBox1_KeyDown(sender As Object, e As KeyEventArgs) Handles RichTextBox1.KeyDown
-        If e.KeyCode = Keys.C AndAlso e.Control Then
-            boolLabelChange = False
-            Exit Sub
+
+    
+
+    Private Sub OnZPLCodeChange(sender As Object, e As EventArgs) Handles RawZPLText.TextChanged
+        If boolStartup Then
+            Console.WriteLine("Startup Mode. Skipping ZPL Code Change.")
+            Return
         End If
-        If e.KeyValue >= 32 And e.KeyValue <= 126 Then
-            If RichTextBox1.Text.StartsWith("^XA") Then
-                pnlZPL.Visible = True
-                DrawLabel()
-                SizeBox()
-                RichTextBox1.Dock = DockStyle.Left
-                boolLabelChange = True
-            End If
+        boolLabelChange = True
+        If TreeView1.SelectedNode Is Nothing OrElse TreeView1.SelectedNode.Level = 0 Then
+            Console.WriteLine("No Selected Node or selected Node is a Folder. Skipping ZPL Code Change.")
+            Return
         End If
 
+        MarkNodeAsChanged(TreeView1.SelectedNode)
+        
+        Console.WriteLine($"ZPL Code Changed. Selected Node: {TreeView1.SelectedNode.Text}")
     End Sub
 
 
-    Private Sub ToolStripButton3_Click(sender As Object, e As EventArgs) Handles ToolStripButton3.Click
+    Private Sub OnClickNewFile(sender As Object, e As EventArgs) Handles NewFileToolStripButton.Click
         Try
-            RichTextBox1.Text = ""
+            RawZPLText.Text = ""
             Dim fu As New frmSave
             fu.ConnectionString = _ConnectionString
             fu.ShowDialog()
@@ -752,7 +741,7 @@ Public Class RawFileEdit
                 cmd.CommandText = "INSERT INTO Reports(ReportDescription, REPORTFILE,REPORTPROGRAM,REPORTTYPE) VALUES (@LABELNAME, @LABELCONTENT,'RAWTEXT',@REPORTTYPE)"
                 cmd.Parameters.AddWithValue("@LABELNAME", strLabelName)
                 cmd.Parameters.AddWithValue("@REPORTTYPE", strLabelType)
-                Dim strLABELCONTENTS As String = RichTextBox1.Text
+                Dim strLABELCONTENTS As String = RawZPLText.Text
                 Dim b As Byte() = Encoding.Unicode.GetBytes(strLABELCONTENTS)
                 cmd.Parameters.AddWithValue("@LabelContent", b)
                 cmd.Connection = Conn
@@ -786,4 +775,217 @@ Public Class RawFileEdit
 
         End Try
     End Sub
+
+    Private Function GetErrorMessage() As String
+        Dim width As Integer = -1
+        Dim height As Integer = -1
+
+        Integer.TryParse(LabelWidthBox.Text, width)
+        Integer.TryParse(LabelHeightBox.Text, height)
+
+        If width <= 0 Then
+            Return "Invalid width. Please enter a valid width."
+        End If
+        If height <= 0 Then
+            Return "Invalid height. Please enter a valid height."
+        End If
+
+        If Not _ZplConverter.IsValidZPL(RawZPLText.Text) Then
+            Return "Invalid ZPL code. Please enter a valid ZPL code."
+        End If
+        Return ""
+    End Function
+
+    Private Function ConvertToInches(value As String, currentUnit As String) As Single
+        Dim result As Single = -1
+        Single.TryParse(value, result)
+        If currentUnit = "cm" Then
+            result = result / 2.54
+        ElseIf currentUnit = "mm" Then
+            result = result / 25.4
+        End If
+        Return result
+    End Function
+
+    ''' <summary>Returns label width and height in inches. Passes back via ByRef; returns False if invalid.</summary>
+    Private Function GetLabelSizeInInches(ByRef widthInches As Single, ByRef heightInches As Single) As Boolean
+        Dim units As String = If(UnitComboBox.SelectedItem IsNot Nothing, UnitComboBox.SelectedItem.ToString().ToLower(), "inches")
+        widthInches = ConvertToInches(LabelWidthBox.Text, units)
+        heightInches = ConvertToInches(LabelHeightBox.Text, units)
+        Return widthInches > 0 AndAlso heightInches > 0
+    End Function
+
+    Private Sub SaveFileLocally(fileName As String, fileData As Byte(), extension As String)
+        Using saveFileDialog As New SaveFileDialog()
+            saveFileDialog.Filter = extension.ToUpper() & "|*." & extension
+            saveFileDialog.Title = "Save " & fileName
+            saveFileDialog.FileName = fileName
+            saveFileDialog.RestoreDirectory = True
+            If (saveFileDialog.ShowDialog() = DialogResult.OK) Then
+                Dim filePath As String = saveFileDialog.FileName
+                File.WriteAllBytes(filePath, fileData)
+                MessageBox.Show("File saved to " & filePath)
+            End If
+        End Using
+    End Sub
+
+    Private Function GetImageStream(contentTypeHeaderValue As String) As MemoryStream
+        Dim errorMessage As String = GetErrorMessage()
+        If errorMessage <> "" Then
+            MessageBox.Show(errorMessage)
+            Return Nothing
+        End If
+        Dim dpm As String = _ZplConverter.GetStringDPMValue(DensityComboBox.SelectedItem.ToString())
+        Dim quality As String = ImagingModeComboBox.SelectedItem
+
+        Dim units As String = If(UnitComboBox.SelectedItem IsNot Nothing, UnitComboBox.SelectedItem.ToString().ToLower(), "inches")
+        Dim width As Single = ConvertToInches(LabelWidthBox.Text, units)
+        Dim height As Single = ConvertToInches(LabelHeightBox.Text, units)
+
+        Dim size As String = width & "x" & height
+
+        Console.WriteLine("Size: " & size)
+
+        Dim imageStream As MemoryStream = _ZplConverter.FetchImageDataFromAPI(RawZPLText.Text, size, dpm, contentTypeHeaderValue, quality)
+        Return imageStream
+    End Function
+
+    Private Sub OnClickDownloadZPL(sender As Object, e As EventArgs) Handles DownloadButtonZPL.Click
+        Dim errorMessage As String = GetErrorMessage()
+        If errorMessage <> "" Then
+            MessageBox.Show(errorMessage)
+            Return
+        End If
+        Dim fileName As String = If(_currentLabel <> "", _currentLabel, "label.zpl")
+        SaveFileLocally(fileName, Encoding.Unicode.GetBytes(RawZPLText.Text), "zpl")
+    End Sub
+
+    Private Sub OnClickDownloadPNG(sender As Object, e As EventArgs) Handles DownloadButtonPNG.Click
+        Dim imageStream As MemoryStream = GetImageStream("image/png")
+        If imageStream Is Nothing Then
+            Return
+        End If
+
+        Dim fileName As String = If(_currentLabel <> "", _currentLabel, "label.png")
+        SaveFileLocally(fileName, imageStream.ToArray(), "png")
+        imageStream.Dispose()
+    End Sub
+
+    Private Sub OnClickDownloadPDF(sender As Object, e As EventArgs) Handles DownloadButtonPDF.Click
+        Dim imageStream As MemoryStream = GetImageStream("application/pdf")
+        If imageStream Is Nothing Then
+            Return
+        End If
+
+        Dim fileName As String = If(_currentLabel <> "", _currentLabel, "label.pdf")
+        SaveFileLocally(fileName, imageStream.ToArray(), "pdf")
+        imageStream.Dispose()
+    End Sub
+
+    Private Sub OnClickDownloadEPL(sender As Object, e As EventArgs) Handles DownloadButtonEPL.Click
+        Dim imageStream As MemoryStream = GetImageStream("application/epl")
+        If imageStream Is Nothing Then
+            Return
+        End If
+
+        Dim fileName As String = If(_currentLabel <> "", _currentLabel, "label.epl")
+        SaveFileLocally(fileName, imageStream.ToArray(), "epl")
+        imageStream.Dispose()
+    End Sub
+
+    Private Sub OnClickDownloadMultiPDF(sender As Object, e As EventArgs) Handles DownloadButtonMultiPDF.Click
+        Dim imageStream As MemoryStream = GetImageStream("application/multi-page-pdf")
+        If imageStream Is Nothing Then
+            Return
+        End If
+
+        Dim fileName As String = If(_currentLabel <> "", _currentLabel, "label.pdf")
+        SaveFileLocally(fileName, imageStream.ToArray(), "pdf")
+        imageStream.Dispose()
+    End Sub
+
+    Private Sub OnClickRedraw(sender As Object, e As EventArgs) Handles RedrawButton.Click
+        Dim widthInches As Single, heightInches As Single
+        If Not GetLabelSizeInInches(widthInches, heightInches) Then Return
+        Dim dpm As String = If(DensityComboBox.SelectedItem IsNot Nothing, DensityComboBox.SelectedItem.ToString(), "8 dpmm (203 dpi)")
+        Me._ZplConverter.ConvertZPLToImage2(RawZPLText.Text, widthInches.ToString() & "x" & heightInches.ToString(), PreviewPictureBox, dpm)
+        If _currentRotationAngle > 0 Then RotateLabel(_currentRotationAngle)
+    End Sub
+
+    Private Sub OnClickRotate(sender As Object, e As EventArgs) Handles RotateButton.Click
+        _currentRotationAngle = (_currentRotationAngle + 90) Mod 360
+        DrawLabel()
+    End Sub
+
+    Private Sub OnClickOpenFile(sender As Object, e As EventArgs) Handles OpenFileButton.Click
+        Using openFileDialog As New OpenFileDialog()
+            openFileDialog.Filter = "ZPL Files (*.zpl)|*.zpl|Text Files (*.txt)|*.txt|All Files (*.*)|*.*"
+            openFileDialog.Title = "Pick a ZPL File"
+            openFileDialog.RestoreDirectory = True
+            If (openFileDialog.ShowDialog() = DialogResult.OK) Then
+                Try
+                    Dim filePath As String = openFileDialog.FileName
+                    Dim zplCode As String = File.ReadAllText(filePath)
+                    RawZPLText.Text = zplCode
+                Catch ex As Exception
+                    MessageBox.Show("Error reading file: " & ex.Message)
+                End Try
+            End If
+        End Using
+    End Sub
+
+    Private Sub OnClickPermalink(sender As Object, e As EventArgs) Handles PermalinkButton.Click
+        If String.IsNullOrWhiteSpace(RawZPLText.Text) OrElse RawZPLText.Text.Length = 0 Then
+            MessageBox.Show("Please enter ZPL code first.")
+            Return
+        End If
+
+        Dim width As Integer = -1
+        Dim height As Integer = -1
+
+        Try
+            Integer.TryParse(LabelWidthBox.Text, width)
+        Catch ex As Exception
+            MessageBox.Show("Invalid width value " & LabelWidthBox.Text)
+        End Try
+
+        Try
+            Integer.TryParse(LabelHeightBox.Text, height)
+        Catch ex As Exception
+            MessageBox.Show("Invalid height value " & LabelHeightBox.Text)
+        End Try
+
+        Dim density As Integer = Me._ZplConverter.GetIntegerDPMValue(DensityComboBox.SelectedItem.ToString())
+        Dim zpl As String = Uri.EscapeDataString(RawZPLText.Text)
+        Dim quality As String = If(ImagingModeComboBox.SelectedItem IsNot Nothing, ImagingModeComboBox.SelectedItem.ToString().ToLower(), "grayscale")
+        Dim permalink As String = "https://labelary.com/viewer.html?density=" & density & "&quality=" & quality
+        If (width > -1) Then
+            permalink = permalink & "&width=" & width
+        End If
+        If (height > -1) Then
+            permalink = permalink & "&height=" & height
+        End If
+
+        Dim units As String = If(UnitComboBox.SelectedItem IsNot Nothing, UnitComboBox.SelectedItem.ToString().ToLower(), "inches")
+        permalink = permalink & "&units=" & units
+
+        permalink = permalink & "&zpl=" & zpl
+        Clipboard.SetText(permalink)
+        MessageBox.Show("Permalink copied to clipboard")
+    End Sub
+
+    Private Function IsNumericKey(e As KeyEventArgs) As Boolean
+        Return (e.KeyCode >= 48 AndAlso e.KeyCode <= 57) OrElse (e.KeyCode >= 96 AndAlso e.KeyCode <= 105)
+    End Function
+
+    Private Function ShouldSuppressKey(e As KeyEventArgs) As Boolean
+        Return Not (Me.IsNumericKey(e) OrElse e.KeyData = Keys.Back OrElse e.KeyData = Keys.Delete)
+    End Function
+
+    Private Sub OnKeydownDimensionBox(sender As Object, e As KeyEventArgs) Handles LabelWidthBox.KeyDown, LabelHeightBox.KeyDown
+        If (Me.ShouldSuppressKey(e)) Then
+            e.SuppressKeyPress = True
+        End If
+    End Sub
+    
 End Class

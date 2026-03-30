@@ -19,6 +19,7 @@ Public Class RawFileEdit
     Private _ConnectionString As String = "User ID=sa;Password=waves428&Blanket;Initial Catalog=barcomdemo;Data Source=SQL.EBARCOM.COM,9876"
     Dim boolStartup As Boolean = True
     Dim boolLabelChange As Boolean = False
+    Private _syncingLabelFromDatabase As Boolean = False
     Dim _lastHitContextMenuNode As TreeNode = Nothing
     'Private _ConnectionString As String = "User ID=AUTOSEQUENCE;Password=AUTOSEQUENCE;Initial Catalog=AUTOSEQUENCE;Data Source=10.113.14.9,8484"
     Property ProgramOption() As Int32
@@ -173,9 +174,9 @@ Public Class RawFileEdit
             cmd.Connection = Conn
             cmd.ExecuteNonQuery()
         Catch ex As SqlClient.SqlException
-
+            Console.WriteLine(ex.ToString())
         Catch ex As Exception
-
+            Console.WriteLine(ex.ToString())
         Finally
             If Conn.State = ConnectionState.Open Then
                 Conn.Close()
@@ -308,7 +309,8 @@ Public Class RawFileEdit
         End If
 
         Dim FO As New OpenFileDialog
-        If FO.ShowDialog = Windows.Forms.DialogResult.OK Then
+        Dim Result As DialogResult = FO.ShowDialog()
+        If Result = Windows.Forms.DialogResult.OK Then
             Dim fs As New frmSave
             fs.ConnectionString = _ConnectionString
             If TreeView1.Nodes.Count > 0 Then
@@ -349,7 +351,11 @@ Public Class RawFileEdit
                 cmd.CommandText = "INSERT INTO Reports(ReportDescription, REPORTFILE,REPORTPROGRAM,REPORTTYPE) VALUES (@LABELNAME, @LABELCONTENT,'RAWTEXT',@REPORTTYPE)"
                 cmd.Parameters.AddWithValue("@LABELNAME", strLabelName)
                 cmd.Parameters.AddWithValue("@REPORTTYPE", strLabelType)
-                Dim strLABELCONTENTS As String = ""
+                Dim lc As New System.IO.StreamReader(FO.FileName)
+                Dim strLABELCONTENTS As String = lc.ReadToEnd()
+                lc.Close()
+                lc.Dispose()
+                lc = Nothing
                 Dim b As Byte() = Encoding.Unicode.GetBytes(strLABELCONTENTS)
                 cmd.Parameters.AddWithValue("@LabelContent", b)
                 cmd.Connection = Conn
@@ -373,7 +379,14 @@ Public Class RawFileEdit
                 cmd.Dispose()
                 cmd = Nothing
             End Try
-
+        ElseIf Result = Windows.Forms.DialogResult.Cancel Then
+            _currentLabel = ""
+            _currentparent = ""
+            boolLabelChange = False
+            boolStartup = True
+            pnlZPL.Visible = False
+            _lastHitContextMenuNode = Nothing
+            TreeView1.SelectedNode = Nothing
         End If
     End Sub
     Sub CheckParentDelete(ByVal strParent As String)
@@ -444,11 +457,11 @@ Public Class RawFileEdit
             Exit Sub
         End If
         If labelUnits = "cm" Then
-            UnitComboBox.SelectedIndex = 1
+            UnitComboBox.SelectedIndex = 2
             Exit Sub
         End If
         If labelUnits = "mm" Then
-            UnitComboBox.SelectedIndex = 2
+            UnitComboBox.SelectedIndex = 1
             Exit Sub
         End If
         ' Default to inches
@@ -474,27 +487,37 @@ Public Class RawFileEdit
             cmd.CommandText = "Select Density, ColorMode, LabelWidth, LabelHeight, LabelUnits, ReportFile  from Reports Where ReportDescription = '" & mn.Text & "'"
             cmd.Connection = Conn
             Dim strModified As String = String.Empty
-            Dim dr As SqlClient.SqlDataReader = cmd.ExecuteReader
-            While dr.Read
-                strModified = System.Text.Encoding.Unicode.GetString(dr("ReportFile"))
-                SetDensity(If(dr("Density") Is DBNull.Value, "8dpmm", dr("Density")))
-                SetColorMode(If(dr("ColorMode") Is DBNull.Value, "Grayscale", dr("ColorMode")))
-                SetLabelWidth(If(dr("LabelWidth") Is DBNull.Value, 4, dr("LabelWidth")))
-                SetLabelHeight(If(dr("LabelHeight") Is DBNull.Value, 6, dr("LabelHeight")))
-                SetLabelUnits(If(dr("LabelUnits") Is DBNull.Value, "inches", dr("LabelUnits")))
-            End While
-            dr.Close()
-            boolLabelChange = False
-            boolStartup = True
-            RawZPLText.Text = strModified
-            boolStartup = False
-            If RawZPLText.Text.StartsWith("^XA") Then
-                DrawLabel()
-                SizeBox()
-                ' RawZPLText.Dock = DockStyle.Left
-            Else
-                ' RawZPLText.Dock = DockStyle.Fill
-            End If
+            Dim dr As SqlClient.SqlDataReader = Nothing
+            _syncingLabelFromDatabase = True
+            Try
+                dr = cmd.ExecuteReader()
+                While dr.Read
+                    strModified = System.Text.Encoding.Unicode.GetString(dr("ReportFile"))
+                    SetDensity(If(dr("Density") Is DBNull.Value, "8dpmm", dr("Density")))
+                    SetColorMode(If(dr("ColorMode") Is DBNull.Value, "Grayscale", dr("ColorMode")))
+                    SetLabelWidth(If(dr("LabelWidth") Is DBNull.Value, 4, dr("LabelWidth")))
+                    SetLabelHeight(If(dr("LabelHeight") Is DBNull.Value, 6, dr("LabelHeight")))
+                    SetLabelUnits(If(dr("LabelUnits") Is DBNull.Value, "inches", dr("LabelUnits")))
+                End While
+                dr.Close()
+                dr = Nothing
+                boolLabelChange = False
+                boolStartup = True
+                RawZPLText.Text = strModified
+                boolStartup = False
+                If RawZPLText.Text.StartsWith("^XA") Then
+                    DrawLabel()
+                    SizeBox()
+                    ' RawZPLText.Dock = DockStyle.Left
+                Else
+                    ' RawZPLText.Dock = DockStyle.Fill
+                End If
+            Finally
+                _syncingLabelFromDatabase = False
+                If dr IsNot Nothing Then
+                    dr.Close()
+                End If
+            End Try
 
         Catch ex As SqlClient.SqlException
             MsgBox(ex.ToString)
@@ -540,11 +563,6 @@ Public Class RawFileEdit
         node.NodeFont = Nothing
     End Sub
 
-    ''' <summary>
-    ''' Clears bold "dirty" styling for the label that has unsaved edits.
-    ''' Uses _currentparent/_currentLabel because the selected node may already be a folder
-    ''' (e.g. right-click Add on a category while a child label still has focus).
-    ''' </summary>
     Private Sub UnmarkDirtyLabelTreeNode()
         Dim dirty As TreeNode = Nothing
         If Not String.IsNullOrEmpty(_currentparent) AndAlso Not String.IsNullOrEmpty(_currentLabel) AndAlso TreeView1.Nodes.ContainsKey(_currentparent) Then
@@ -557,7 +575,6 @@ Public Class RawFileEdit
             dirty = TreeView1.SelectedNode
         End If
         If dirty IsNot Nothing Then
-            Console.WriteLine("Dirty: " & dirty.Text)
             UnmarkNodeAsChanged(dirty)
         End If
     End Sub
@@ -717,20 +734,6 @@ Public Class RawFileEdit
         End If
     End Sub
 
-    Private Sub OnDensityChanged(sender As Object, e As EventArgs) Handles DensityComboBox.SelectedIndexChanged
-        If boolStartup = False Then
-            DrawLabel()
-        Else
-            boolStartup = False
-        End If
-    End Sub
-
-    Private Sub OnUnitChanged(sender As Object, e As EventArgs) Handles UnitComboBox.SelectedIndexChanged
-        If boolStartup = False AndAlso RawZPLText.Text.StartsWith("^XA") Then
-            DrawLabel()
-        End If
-    End Sub
-
 
     Private Sub OnClickRotateToolStripButton(sender As Object, e As EventArgs) Handles RotateToolStripButton.Click
         Try
@@ -877,7 +880,7 @@ Public Class RawFileEdit
     End Sub
 
     Private Sub OnLabelChanged(sender As Object, e As EventArgs) Handles DensityComboBox.SelectedIndexChanged, ImagingModeComboBox.SelectedIndexChanged, LabelWidthBox.TextChanged, LabelHeightBox.TextChanged, UnitComboBox.SelectedIndexChanged, RawZPLText.TextChanged
-        If boolStartup OrElse TreeView1.SelectedNode Is Nothing OrElse TreeView1.SelectedNode.Level = 0 Then
+        If boolStartup OrElse _syncingLabelFromDatabase OrElse TreeView1.SelectedNode Is Nothing OrElse TreeView1.SelectedNode.Level = 0 Then
             Return
         End If
         boolLabelChange = True
@@ -1006,7 +1009,6 @@ Public Class RawFileEdit
         Return result
     End Function
 
-    ''' <summary>Returns label width and height in inches. Passes back via ByRef; returns False if invalid.</summary>
     Private Function GetLabelSizeInInches(ByRef widthInches As Single, ByRef heightInches As Single) As Boolean
         Dim units As String = If(UnitComboBox.SelectedItem IsNot Nothing, UnitComboBox.SelectedItem.ToString().ToLower(), "inches")
         widthInches = ConvertToInches(LabelWidthBox.Text, units)

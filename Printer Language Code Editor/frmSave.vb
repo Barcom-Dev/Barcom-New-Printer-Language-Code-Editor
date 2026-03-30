@@ -29,7 +29,6 @@ Public Class frmSave
         conn.Close()
         conn.Dispose()
         conn = Nothing
-      
     End Sub
 
     Private Sub cmdCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdCancel.Click

@@ -25,6 +25,7 @@ Partial Class RawFileEdit
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(RawFileEdit))
         Me.RawZPLText = New System.Windows.Forms.RichTextBox()
         Me.ContextMenuStrip6 = New System.Windows.Forms.ContextMenuStrip(Me.components)
+        Me.NewFileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.AddToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.DeleteToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.SaveToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -63,7 +64,7 @@ Partial Class RawFileEdit
         Me.DownloadButtonZPL = New System.Windows.Forms.Button()
         Me.lblSelected = New System.Windows.Forms.Label()
         Me.ToolStrip1 = New System.Windows.Forms.ToolStrip()
-        Me.NewFileToolStripButton = New System.Windows.Forms.ToolStripButton()
+        Me.NewLabelToolStripButton = New System.Windows.Forms.ToolStripButton()
         Me.AddFromFileToolStripButton = New System.Windows.Forms.ToolStripButton()
         Me.DeleteToolStripButton = New System.Windows.Forms.ToolStripButton()
         Me.SaveToolStripButton = New System.Windows.Forms.ToolStripButton()
@@ -100,36 +101,43 @@ Partial Class RawFileEdit
         'ContextMenuStrip6
         '
         Me.ContextMenuStrip6.ImageScalingSize = New System.Drawing.Size(24, 24)
-        Me.ContextMenuStrip6.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AddToolStripMenuItem, Me.DeleteToolStripMenuItem, Me.SaveToolStripMenuItem, Me.PrintToolStripMenuItem})
+        Me.ContextMenuStrip6.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.NewFileToolStripMenuItem, Me.AddToolStripMenuItem, Me.DeleteToolStripMenuItem, Me.SaveToolStripMenuItem, Me.PrintToolStripMenuItem})
         Me.ContextMenuStrip6.Name = "ContextMenuStrip6"
-        Me.ContextMenuStrip6.Size = New System.Drawing.Size(143, 132)
+        Me.ContextMenuStrip6.Size = New System.Drawing.Size(155, 164)
+        '
+        'NewFileToolStripMenuItem
+        '
+        Me.NewFileToolStripMenuItem.Image = CType(resources.GetObject("NewFileToolStripMenuItem.Image"), System.Drawing.Image)
+        Me.NewFileToolStripMenuItem.Name = "NewFileToolStripMenuItem"
+        Me.NewFileToolStripMenuItem.Size = New System.Drawing.Size(154, 32)
+        Me.NewFileToolStripMenuItem.Text = "New"
         '
         'AddToolStripMenuItem
         '
         Me.AddToolStripMenuItem.Image = CType(resources.GetObject("AddToolStripMenuItem.Image"), System.Drawing.Image)
         Me.AddToolStripMenuItem.Name = "AddToolStripMenuItem"
-        Me.AddToolStripMenuItem.Size = New System.Drawing.Size(142, 32)
-        Me.AddToolStripMenuItem.Text = "Add"
+        Me.AddToolStripMenuItem.Size = New System.Drawing.Size(154, 32)
+        Me.AddToolStripMenuItem.Text = "Add file"
         '
         'DeleteToolStripMenuItem
         '
         Me.DeleteToolStripMenuItem.Image = CType(resources.GetObject("DeleteToolStripMenuItem.Image"), System.Drawing.Image)
         Me.DeleteToolStripMenuItem.Name = "DeleteToolStripMenuItem"
-        Me.DeleteToolStripMenuItem.Size = New System.Drawing.Size(142, 32)
+        Me.DeleteToolStripMenuItem.Size = New System.Drawing.Size(154, 32)
         Me.DeleteToolStripMenuItem.Text = "Delete"
         '
         'SaveToolStripMenuItem
         '
         Me.SaveToolStripMenuItem.Image = CType(resources.GetObject("SaveToolStripMenuItem.Image"), System.Drawing.Image)
         Me.SaveToolStripMenuItem.Name = "SaveToolStripMenuItem"
-        Me.SaveToolStripMenuItem.Size = New System.Drawing.Size(142, 32)
+        Me.SaveToolStripMenuItem.Size = New System.Drawing.Size(154, 32)
         Me.SaveToolStripMenuItem.Text = "Save"
         '
         'PrintToolStripMenuItem
         '
         Me.PrintToolStripMenuItem.Image = CType(resources.GetObject("PrintToolStripMenuItem.Image"), System.Drawing.Image)
         Me.PrintToolStripMenuItem.Name = "PrintToolStripMenuItem"
-        Me.PrintToolStripMenuItem.Size = New System.Drawing.Size(142, 32)
+        Me.PrintToolStripMenuItem.Size = New System.Drawing.Size(154, 32)
         Me.PrintToolStripMenuItem.Text = "Print"
         '
         'SplitContainer1
@@ -226,7 +234,7 @@ Partial Class RawFileEdit
         '
         Me.PermalinkButton.AutoSize = True
         Me.PermalinkButton.Font = New System.Drawing.Font("Baskerville Old Face", 9.75!)
-        Me.PermalinkButton.Location = New System.Drawing.Point(245, 20)
+        Me.PermalinkButton.Location = New System.Drawing.Point(280, 20)
         Me.PermalinkButton.Name = "PermalinkButton"
         Me.PermalinkButton.Size = New System.Drawing.Size(103, 33)
         Me.PermalinkButton.TabIndex = 18
@@ -237,7 +245,7 @@ Partial Class RawFileEdit
         '
         Me.OpenFileButton.AutoSize = True
         Me.OpenFileButton.Font = New System.Drawing.Font("Baskerville Old Face", 9.75!)
-        Me.OpenFileButton.Location = New System.Drawing.Point(156, 20)
+        Me.OpenFileButton.Location = New System.Drawing.Point(176, 20)
         Me.OpenFileButton.Name = "OpenFileButton"
         Me.OpenFileButton.Size = New System.Drawing.Size(95, 33)
         Me.OpenFileButton.TabIndex = 17
@@ -248,7 +256,7 @@ Partial Class RawFileEdit
         '
         Me.RotateButton.AutoSize = True
         Me.RotateButton.Font = New System.Drawing.Font("Baskerville Old Face", 9.75!)
-        Me.RotateButton.Location = New System.Drawing.Point(78, 20)
+        Me.RotateButton.Location = New System.Drawing.Point(96, 20)
         Me.RotateButton.Name = "RotateButton"
         Me.RotateButton.Size = New System.Drawing.Size(71, 33)
         Me.RotateButton.TabIndex = 3
@@ -524,22 +532,22 @@ Partial Class RawFileEdit
         Me.ToolStrip1.Font = New System.Drawing.Font("Verdana", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ToolStrip1.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
         Me.ToolStrip1.ImageScalingSize = New System.Drawing.Size(32, 32)
-        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.NewFileToolStripButton, Me.AddFromFileToolStripButton, Me.DeleteToolStripButton, Me.SaveToolStripButton, Me.PrintToolStripButton, Me.RotateToolStripButton, Me.FillVariablesToolStripButton})
+        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.NewLabelToolStripButton, Me.AddFromFileToolStripButton, Me.DeleteToolStripButton, Me.SaveToolStripButton, Me.PrintToolStripButton, Me.RotateToolStripButton, Me.FillVariablesToolStripButton})
         Me.ToolStrip1.Location = New System.Drawing.Point(0, 0)
         Me.ToolStrip1.Name = "ToolStrip1"
         Me.ToolStrip1.Size = New System.Drawing.Size(1348, 70)
         Me.ToolStrip1.TabIndex = 8
         Me.ToolStrip1.Text = "ToolStrip1"
         '
-        'NewFileToolStripButton
+        'NewLabelToolStripButton
         '
-        Me.NewFileToolStripButton.ForeColor = System.Drawing.Color.White
-        Me.NewFileToolStripButton.Image = CType(resources.GetObject("NewFileToolStripButton.Image"), System.Drawing.Image)
-        Me.NewFileToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.NewFileToolStripButton.Name = "NewFileToolStripButton"
-        Me.NewFileToolStripButton.Size = New System.Drawing.Size(69, 65)
-        Me.NewFileToolStripButton.Text = "New"
-        Me.NewFileToolStripButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText
+        Me.NewLabelToolStripButton.ForeColor = System.Drawing.Color.White
+        Me.NewLabelToolStripButton.Image = CType(resources.GetObject("NewLabelToolStripButton.Image"), System.Drawing.Image)
+        Me.NewLabelToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.NewLabelToolStripButton.Name = "NewLabelToolStripButton"
+        Me.NewLabelToolStripButton.Size = New System.Drawing.Size(69, 65)
+        Me.NewLabelToolStripButton.Text = "New"
+        Me.NewLabelToolStripButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText
         '
         'AddFromFileToolStripButton
         '
@@ -639,8 +647,10 @@ Partial Class RawFileEdit
         Me.PerformLayout()
 
     End Sub
+
     Friend WithEvents RawZPLText As System.Windows.Forms.RichTextBox
     Friend WithEvents ContextMenuStrip6 As System.Windows.Forms.ContextMenuStrip
+    Friend WithEvents NewFileToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents AddToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents DeleteToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents SaveToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
@@ -664,7 +674,7 @@ Partial Class RawFileEdit
     Friend WithEvents RotateToolStripButton As ToolStripButton
     Friend WithEvents FillVariablesToolStripButton As ToolStripButton
     Friend WithEvents lblSelected As Label
-    Friend WithEvents NewFileToolStripButton As ToolStripButton
+    Friend WithEvents NewLabelToolStripButton As ToolStripButton
     Friend WithEvents PrintOptionsGroupBox As GroupBox
     Friend WithEvents DensityLabel As Label
     Friend WithEvents ImagingModeLabel As Label

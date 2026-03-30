@@ -1,3 +1,4 @@
+Imports System.ComponentModel
 Imports System.IO
 Imports System.Net
 Imports System.Text
@@ -11,12 +12,14 @@ Public Class RawFileEdit
     Private _AvailableOptions As Specialized.StringCollection
 
     'Private _connectionstring As String = My.Settings.ConnectionStirng
+    Dim deletingCurrentLabel As Boolean = False
     Dim _currentLabel As String = ""
     Dim _currentparent As String = ""
     Private _UserCode As String = "bhamer"
     Private _ConnectionString As String = "User ID=sa;Password=waves428&Blanket;Initial Catalog=barcomdemo;Data Source=SQL.EBARCOM.COM,9876"
     Dim boolStartup As Boolean = True
     Dim boolLabelChange As Boolean = False
+    Dim _lastHitContextMenuNode As TreeNode = Nothing
     'Private _ConnectionString As String = "User ID=AUTOSEQUENCE;Password=AUTOSEQUENCE;Initial Catalog=AUTOSEQUENCE;Data Source=10.113.14.9,8484"
     Property ProgramOption() As Int32
         Get
@@ -84,6 +87,7 @@ Public Class RawFileEdit
                 While dr.Read
                     'do stuff here
                     TreeView1.Nodes(i).Nodes.Add(dr("ReportDescription"), dr("ReportDescription"), "FILE", "FILE")
+                    pnlZPL.Visible = True
                 End While
                 dr.Close()
             Next
@@ -99,6 +103,7 @@ Public Class RawFileEdit
         Dim Conn As New SqlClient.SqlConnection(_ConnectionString)
         Dim cmd As New SqlClient.SqlCommand
         TreeView1.Nodes.Clear()
+        pnlZPL.Visible = False
         cmd.Connection = Conn
         cmd.CommandType = CommandType.Text
         cmd.CommandText = "Select ReportType from Reports where ReportProgram = 'RAWTEXT' and isnull(ReportTYPE,'') <> '' Group by ReportType "
@@ -107,7 +112,7 @@ Public Class RawFileEdit
             cmd.Connection.Open()
             Dim dr As SqlClient.SqlDataReader = cmd.ExecuteReader
             While dr.Read
-                TreeView1.Nodes.Add(dr("REPORTTYPE"), dr("REPORTTYPE"), "FOLDER", "FOLDER")
+                TreeView1.Nodes.Add(dr("REPORTTYPE"), dr("REPORTTYPE"), "Folder", "Folder")
             End While
             dr.Close()
             dr = Nothing
@@ -127,29 +132,43 @@ Public Class RawFileEdit
             cmd.Dispose()
             cmd = Nothing
         End Try
-
     End Sub
 
+    Private Sub SaveCurrentLabel(Optional labelName As String = Nothing)
+        Dim labelToSave As String = If(String.IsNullOrEmpty(labelName), _currentLabel, labelName)
+        Dim densityDb As String = _ZplConverter.GetStringDPMValue(
+            If(DensityComboBox.SelectedItem IsNot Nothing, DensityComboBox.SelectedItem.ToString(), ""))
+        Dim colorMode As String = If(ImagingModeComboBox.SelectedItem IsNot Nothing,
+            ImagingModeComboBox.SelectedItem.ToString(), "Grayscale")
+        Dim labelW As Single
+        Dim labelH As Single
+        If Not Single.TryParse(LabelWidthBox.Text, labelW) Then
+            labelW = 4
+        End If
+        If Not Single.TryParse(LabelHeightBox.Text, labelH) Then
+            labelH = 6
+        End If
+        Dim labelUnits As String = If(UnitComboBox.SelectedItem IsNot Nothing,
+            UnitComboBox.SelectedItem.ToString().ToLower(), "inches")
 
-    Private Sub SaveToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles SaveToolStripMenuItem.Click
         Dim Conn As New SqlClient.SqlConnection(_ConnectionString)
         Dim cmd As SqlClient.SqlCommand = Nothing
         Try
-            If TreeView1.SelectedNode.Level = 0 Then
-                MessageBox.Show("Please select a label to save")
-                Exit Sub
-            End If
-            If MessageBox.Show("Are you Sure you want to Save the Label:" & _currentLabel, "", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = Windows.Forms.DialogResult.No Then
-                Exit Sub
-            End If
-
             Conn.Open()
             cmd = New SqlClient.SqlCommand
             cmd.CommandType = CommandType.Text
-            cmd.CommandText = "Update Reports Set ReportFile = @LabelContent Where REPORTDESCRIPTION = '" & _currentLabel & "'"
+            cmd.CommandText = "Update Reports Set ReportFile = @LabelContent, Density = @Density, ColorMode = @ColorMode, " &
+                "LabelWidth = @LabelWidth, LabelHeight = @LabelHeight, LabelUnits = @LabelUnits " &
+                "Where REPORTDESCRIPTION = @ReportDesc"
 
             Dim b As Byte() = Encoding.Unicode.GetBytes(RawZPLText.Text)
             cmd.Parameters.AddWithValue("@LabelContent", b)
+            cmd.Parameters.AddWithValue("@Density", densityDb)
+            cmd.Parameters.AddWithValue("@ColorMode", colorMode)
+            cmd.Parameters.AddWithValue("@LabelWidth", labelW)
+            cmd.Parameters.AddWithValue("@LabelHeight", labelH)
+            cmd.Parameters.AddWithValue("@LabelUnits", labelUnits)
+            cmd.Parameters.AddWithValue("@ReportDesc", labelToSave)
 
             cmd.Connection = Conn
             cmd.ExecuteNonQuery()
@@ -164,33 +183,65 @@ Public Class RawFileEdit
                 Conn = Nothing
             End If
         End Try
-
     End Sub
+
+    Private Sub OnClickSaveToolStripMenuItem(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles SaveToolStripMenuItem.Click
+        If TreeView1.SelectedNode Is Nothing OrElse TreeView1.SelectedNode.Level = 0 Then
+            MessageBox.Show("Please select a label to save")
+            Exit Sub
+        End If
+        Dim selectedLabel As String = TreeView1.SelectedNode.Text
+        If MessageBox.Show("Are you Sure you want to Save the Label: " & selectedLabel, "", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = Windows.Forms.DialogResult.No Then
+            Exit Sub
+        End If
+        If selectedLabel = _currentLabel Then
+            _currentLabel = ""
+            boolLabelChange = False
+            SaveCurrentLabel(selectedLabel)
+            UnmarkNodeAsChanged(TreeView1.SelectedNode)
+            Exit Sub
+        End If
+        SaveCurrentLabel(selectedLabel)
+    End Sub
+
     Sub Loaditup()
         FillTYpe()
     End Sub
 
-    Private Sub DeleteToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles DeleteToolStripMenuItem.Click
+    Private Sub OnClickDeleteToolStripMenuItem(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles DeleteToolStripMenuItem.Click
+        If _lastHitContextMenuNode Is Nothing Then
+            Exit Sub
+        End If
+
         Dim Conn As New SqlClient.SqlConnection(_ConnectionString)
         Dim cmd As SqlClient.SqlCommand = Nothing
         Try
-            If TreeView1.SelectedNode.Level = 0 Then
+            If _lastHitContextMenuNode.Level = 0 Then
                 Exit Sub
             End If
-            If MessageBox.Show("Are you Sure you want to Delete the label:" & _currentLabel, "", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = Windows.Forms.DialogResult.Yes Then
+            Dim selectedLabel As String = _lastHitContextMenuNode.Text
+            Dim selectedParent As String = _lastHitContextMenuNode.Parent.Text
+            If MessageBox.Show("Are you Sure you want to Delete the label: " & selectedLabel, "", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = Windows.Forms.DialogResult.Yes Then
                 Conn.Open()
                 cmd = New SqlClient.SqlCommand
                 cmd.CommandType = CommandType.Text
-                cmd.CommandText = "Delete From Reports where ReportDescription = '" & _currentLabel & "'"
+                cmd.CommandText = "Delete From Reports where ReportDescription = '" & selectedLabel & "'"
                 cmd.Connection = Conn
                 cmd.ExecuteNonQuery()
+                If selectedLabel = _currentLabel Then
+                    _currentLabel = ""
+                    boolLabelChange = False
+                    pnlZPL.Visible = False
+                    boolStartup = True
+                    RawZPLText.Text = ""
+                End If
+                TreeView1.Nodes(selectedParent).Nodes(selectedLabel).Remove()
+                CheckParentDelete(selectedParent)
             End If
-            TreeView1.Nodes(_currentparent).Nodes(_currentLabel).Remove()
-            CheckParentDelete(_currentparent)
         Catch ex As SqlClient.SqlException
-
+            Console.WriteLine(ex.ToString())
         Catch ex As Exception
-
+            Console.WriteLine(ex.ToString())
         Finally
             If Conn.State = ConnectionState.Open Then
                 Conn.Close()
@@ -239,31 +290,50 @@ Public Class RawFileEdit
                     Return
                 End If
             Next
-            TreeView1.Nodes.Add(strNode, strNode, 0, 0)
+            TreeView1.Nodes.Add(strNode, strNode, "Folder", "Folder")
         Catch ex As Exception
 
         End Try
     End Sub
-    Private Sub AddToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles AddToolStripMenuItem.Click
+
+    Private Sub OnClickAddToolStripMenuItem(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles AddToolStripMenuItem.Click
+        If boolLabelChange Then
+            Dim choice As DialogResult = TreeView1_BeforeSelect(Nothing, Nothing)
+            If choice = DialogResult.Cancel Then
+                Return
+            End If
+            boolLabelChange = False
+            boolStartup = True
+            pnlZPL.Visible = False
+        End If
+
         Dim FO As New OpenFileDialog
         If FO.ShowDialog = Windows.Forms.DialogResult.OK Then
-            Dim fu As New frmSave
-            fu.ConnectionString = _ConnectionString
+            Dim fs As New frmSave
+            fs.ConnectionString = _ConnectionString
             If TreeView1.Nodes.Count > 0 Then
-                If TreeView1.SelectedNode.Level = 0 Then
-                    fu.cboReportCategory.Text = TreeView1.SelectedNode.Text
+                If TreeView1.SelectedNode Is Nothing Then
+                    fs.cboReportCategory.Text = TreeView1.Nodes(0).Text
+                ElseIf TreeView1.SelectedNode.Level = 0 Then
+                    fs.cboReportCategory.Text = TreeView1.SelectedNode.Text
+                Else
+                    fs.cboReportCategory.Text = TreeView1.Nodes(0).Text
                 End If
             End If
-            fu.ShowDialog()
+            fs.ShowDialog()
 
-            If fu.DialogResult = Windows.Forms.DialogResult.Cancel Then
+            If fs.DialogResult = Windows.Forms.DialogResult.Cancel Then
+                _currentLabel = ""
+                _currentparent = ""
+                _lastHitContextMenuNode = Nothing
+                TreeView1.SelectedNode = Nothing
                 Exit Sub
             End If
-            Dim strLabelName As String = fu.txtReportName.Text
-            Dim strLabelType As String = fu.cboReportCategory.Text
+            Dim strLabelName As String = fs.txtReportName.Text
+            Dim strLabelType As String = fs.cboReportCategory.Text
             If doesExist(strLabelName) Then
                 MessageBox.Show("Report " & strLabelName & "already exist. Please Choose another Name.")
-                fu.ShowDialog()
+                fs.ShowDialog()
             End If
             If strLabelName = "" Then
                 Exit Sub
@@ -279,15 +349,13 @@ Public Class RawFileEdit
                 cmd.CommandText = "INSERT INTO Reports(ReportDescription, REPORTFILE,REPORTPROGRAM,REPORTTYPE) VALUES (@LABELNAME, @LABELCONTENT,'RAWTEXT',@REPORTTYPE)"
                 cmd.Parameters.AddWithValue("@LABELNAME", strLabelName)
                 cmd.Parameters.AddWithValue("@REPORTTYPE", strLabelType)
-                Dim lc As New System.IO.StreamReader(FO.FileName)
-                Dim strLABELCONTENTS As String = lc.ReadToEnd
-                lc.Close()
+                Dim strLABELCONTENTS As String = ""
                 Dim b As Byte() = Encoding.Unicode.GetBytes(strLABELCONTENTS)
                 cmd.Parameters.AddWithValue("@LabelContent", b)
                 cmd.Connection = Conn
                 cmd.ExecuteNonQuery()
                 CheckforNodeExistence(strLabelType)
-                TreeView1.Nodes(strLabelType).Nodes.Add(strLabelName, strLabelName, 1, 1)
+                TreeView1.Nodes(strLabelType).Nodes.Add(strLabelName, strLabelName, "FILE", "FILE")
                 TreeView1.SelectedNode = TreeView1.Nodes(strLabelType).Nodes(strLabelName)
                 _currentparent = strLabelType
                 _currentLabel = strLabelName
@@ -329,51 +397,118 @@ Public Class RawFileEdit
     ' Add a variable to track the current rotation angle
     Private _currentRotationAngle As Integer = 0
 
+    Sub SetDensity(ByVal density As String)
+        If density = "6dpmm" Then
+            DensityComboBox.SelectedIndex = 0
+            Exit Sub
+        End If
+        If density = "12dpmm" Then
+            DensityComboBox.SelectedIndex = 2
+            Exit Sub
+        End If
+        If density = "24dpmm" Then
+            DensityComboBox.SelectedIndex = 3
+            Exit Sub
+        End If
+        ' Default to 8 dpmm (203 dpi)
+        DensityComboBox.SelectedIndex = 1
+    End Sub
+
+    Sub SetColorMode(ByVal colorMode As String)
+        If colorMode = "Bitonal" Then
+            ImagingModeComboBox.SelectedIndex = 1
+            Exit Sub
+        End If
+        ImagingModeComboBox.SelectedIndex = 0
+    End Sub
+
+    Sub SetLabelWidth(ByVal labelWidth As Single)
+        If String.IsNullOrEmpty(labelWidth) Then
+            LabelWidthBox.Text = "4"
+            Exit Sub
+        End If
+        LabelWidthBox.Text = labelWidth.ToString()
+    End Sub
+
+    Sub SetLabelHeight(ByVal labelHeight As Single)
+        If String.IsNullOrEmpty(labelHeight) Then
+            LabelHeightBox.Text = "6"
+            Exit Sub
+        End If
+        LabelHeightBox.Text = labelHeight.ToString()
+    End Sub
+
+    Sub SetLabelUnits(ByVal labelUnits As String)
+        If String.IsNullOrEmpty(labelUnits) Then
+            UnitComboBox.SelectedIndex = 0
+            Exit Sub
+        End If
+        If labelUnits = "cm" Then
+            UnitComboBox.SelectedIndex = 1
+            Exit Sub
+        End If
+        If labelUnits = "mm" Then
+            UnitComboBox.SelectedIndex = 2
+            Exit Sub
+        End If
+        ' Default to inches
+        UnitComboBox.SelectedIndex = 0
+    End Sub
+
     Sub DrawZPLLabel()
         Dim mn As TreeNode = TreeView1.SelectedNode
-        If mn.Level <> 0 Then
-            ' Reset the rotation angle when a new label is selected
-            _currentRotationAngle = 0
-            PreviewPictureBox.Image = Nothing ' Clear the previous image
-            Dim result As Object
-            Dim Conn As New SqlClient.SqlConnection(_ConnectionString)
-            Dim cmd As SqlClient.SqlCommand = Nothing
-            Try
-                _currentLabel = mn.Text
-                _currentparent = mn.Parent.Text
-                Conn.Open()
-                cmd = New SqlClient.SqlCommand
-                cmd.CommandType = CommandType.Text
-                cmd.CommandText = "Select ReportFile from Reports Where ReportDescription = '" & mn.Text & "'"
-                cmd.Connection = Conn
-                result = cmd.ExecuteScalar
-                Dim strModified As String = System.Text.Encoding.Unicode.GetString(result)
-                boolLabelChange = False
-                boolStartup = True
-                RawZPLText.Text = strModified
-                boolStartup = False
-                If RawZPLText.Text.StartsWith("^XA") Then
-                    DrawLabel()
-                    SizeBox()
-                    ' RawZPLText.Dock = DockStyle.Left
-                Else
-                    ' RawZPLText.Dock = DockStyle.Fill
-                End If
-            Catch ex As SqlClient.SqlException
-                MsgBox(ex.ToString)
-            Catch ex As Exception
-                MsgBox(ex.ToString)
-            Finally
-                If Conn.State = ConnectionState.Open Then
-                    Conn.Close()
-                    Conn.Dispose()
-                    Conn = Nothing
-                End If
-                cmd.Dispose()
-                cmd = Nothing
-            End Try
+        If mn.Level = 0 Then
+            Exit Sub
         End If
+        ' Reset the rotation angle when a new label is selected
+        _currentRotationAngle = 0
+        PreviewPictureBox.Image = Nothing ' Clear the previous image
+        Dim Conn As New SqlClient.SqlConnection(_ConnectionString)
+        Dim cmd As SqlClient.SqlCommand = Nothing
+        Try
+            _currentLabel = mn.Text
+            _currentparent = mn.Parent.Text
+            Conn.Open()
+            cmd = New SqlClient.SqlCommand
+            cmd.CommandType = CommandType.Text
+            cmd.CommandText = "Select Density, ColorMode, LabelWidth, LabelHeight, LabelUnits, ReportFile  from Reports Where ReportDescription = '" & mn.Text & "'"
+            cmd.Connection = Conn
+            Dim strModified As String = String.Empty
+            Dim dr As SqlClient.SqlDataReader = cmd.ExecuteReader
+            While dr.Read
+                strModified = System.Text.Encoding.Unicode.GetString(dr("ReportFile"))
+                SetDensity(If(dr("Density") Is DBNull.Value, "8dpmm", dr("Density")))
+                SetColorMode(If(dr("ColorMode") Is DBNull.Value, "Grayscale", dr("ColorMode")))
+                SetLabelWidth(If(dr("LabelWidth") Is DBNull.Value, 4, dr("LabelWidth")))
+                SetLabelHeight(If(dr("LabelHeight") Is DBNull.Value, 6, dr("LabelHeight")))
+                SetLabelUnits(If(dr("LabelUnits") Is DBNull.Value, "inches", dr("LabelUnits")))
+            End While
+            dr.Close()
+            boolLabelChange = False
+            boolStartup = True
+            RawZPLText.Text = strModified
+            boolStartup = False
+            If RawZPLText.Text.StartsWith("^XA") Then
+                DrawLabel()
+                SizeBox()
+                ' RawZPLText.Dock = DockStyle.Left
+            Else
+                ' RawZPLText.Dock = DockStyle.Fill
+            End If
 
+        Catch ex As SqlClient.SqlException
+            MsgBox(ex.ToString)
+        Catch ex As Exception
+            MsgBox(ex.ToString)
+        Finally
+            If Conn.State = ConnectionState.Open Then
+                Conn.Close()
+                Conn.Dispose()
+                Conn = Nothing
+            End If
+            cmd.Dispose()
+            cmd = Nothing
+        End Try
     End Sub
 
 
@@ -405,23 +540,49 @@ Public Class RawFileEdit
         node.NodeFont = Nothing
     End Sub
 
-    Private Sub TreeView1_BeforeSelect(sender As Object, e As TreeViewCancelEventArgs) Handles TreeView1.BeforeSelect
-        If Not boolLabelChange Then
-            Return
+    ''' <summary>
+    ''' Clears bold "dirty" styling for the label that has unsaved edits.
+    ''' Uses _currentparent/_currentLabel because the selected node may already be a folder
+    ''' (e.g. right-click Add on a category while a child label still has focus).
+    ''' </summary>
+    Private Sub UnmarkDirtyLabelTreeNode()
+        Dim dirty As TreeNode = Nothing
+        If Not String.IsNullOrEmpty(_currentparent) AndAlso Not String.IsNullOrEmpty(_currentLabel) AndAlso TreeView1.Nodes.ContainsKey(_currentparent) Then
+            Dim parentNode As TreeNode = TreeView1.Nodes(_currentparent)
+            If parentNode.Nodes.ContainsKey(_currentLabel) Then
+                dirty = parentNode.Nodes(_currentLabel)
+            End If
         End If
-        Select Case MessageBox.Show($"{_currentLabel} has unsaved changes. Do you want to Save before proceeding?", "Save Changes", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question)
+        If dirty Is Nothing AndAlso TreeView1.SelectedNode IsNot Nothing AndAlso TreeView1.SelectedNode.Level <> 0 Then
+            dirty = TreeView1.SelectedNode
+        End If
+        If dirty IsNot Nothing Then
+            Console.WriteLine("Dirty: " & dirty.Text)
+            UnmarkNodeAsChanged(dirty)
+        End If
+    End Sub
+
+    Private Function TreeView1_BeforeSelect(sender As Object, e As TreeViewCancelEventArgs) As DialogResult Handles TreeView1.BeforeSelect
+        If Not boolLabelChange OrElse _currentLabel = "" Then
+            Return Nothing
+        End If
+        Dim choice As DialogResult = MessageBox.Show($"{_currentLabel} has unsaved changes. Do you want to Save before proceeding?", "Save Changes", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question)
+        Select Case choice
             Case DialogResult.Yes
-                SaveToolStripMenuItem_Click(Nothing, Nothing)
+                SaveCurrentLabel()
                 boolLabelChange = False
-                UnmarkNodeAsChanged(TreeView1.SelectedNode)
+                UnmarkDirtyLabelTreeNode()
             Case DialogResult.No
                 boolLabelChange = False
-                UnmarkNodeAsChanged(TreeView1.SelectedNode)
-                Return
+                UnmarkDirtyLabelTreeNode()
             Case DialogResult.Cancel
-                e.Cancel = True
+                If e IsNot Nothing Then
+                    e.Cancel = True
+                End If
+                Return DialogResult.Cancel
         End Select
-    End Sub
+        Return choice
+    End Function
 
     Sub SizeBox()
         Try
@@ -457,24 +618,47 @@ Public Class RawFileEdit
     End Sub
 
     Private Sub OnClickAddFromFile(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles AddFromFileToolStripButton.Click
-        AddToolStripMenuItem_Click(Nothing, Nothing)
+        OnClickAddToolStripMenuItem(Nothing, Nothing)
     End Sub
 
     Private Sub OnClickDelete(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles DeleteToolStripButton.Click
-        DeleteToolStripMenuItem_Click(Nothing, Nothing)
+        If TreeView1.SelectedNode Is Nothing OrElse TreeView1.SelectedNode.Level = 0 Then
+            MessageBox.Show("Please select a label to delete")
+            Exit Sub
+        End If
+        _lastHitContextMenuNode = TreeView1.SelectedNode
+        OnClickDeleteToolStripMenuItem(Nothing, Nothing)
     End Sub
 
     Private Sub OnClickSave(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles SaveToolStripButton.Click
-        boolLabelChange = False
-        SaveToolStripMenuItem_Click(Nothing, Nothing)
+        If TreeView1.SelectedNode Is Nothing OrElse TreeView1.SelectedNode.Level = 0 Then
+            MessageBox.Show("Please select a label to save")
+            Exit Sub
+        End If
+        If MessageBox.Show("Are you Sure you want to Save the Label: " & _currentLabel, "", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = Windows.Forms.DialogResult.No Then
+            Exit Sub
+        End If
+        Dim selectedLabel As String = TreeView1.SelectedNode.Text
+        SaveCurrentLabel(selectedLabel)
+        If selectedLabel = _currentLabel Then
+            boolLabelChange = False
+            UnmarkNodeAsChanged(TreeView1.SelectedNode)
+        End If
     End Sub
 
     Private Sub OnClickPrint(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles PrintToolStripButton.Click
         Dim pc As New PrintDialog
+        If _currentLabel = "" Then
+            MessageBox.Show("Please select a label to print")
+            Exit Sub
+        End If
+        If RawZPLText.Text = "" Then
+            MessageBox.Show("Please enter ZPL code")
+            Exit Sub
+        End If
         If pc.ShowDialog() = Windows.Forms.DialogResult.OK Then
             Printerout.SendStringToPrinter(pc.PrinterSettings.PrinterName, RawZPLText.Text)
         End If
-
     End Sub
 
     Sub DrawLabel()
@@ -575,7 +759,7 @@ Public Class RawFileEdit
         End Try
     End Sub
 
-    Private Sub ToolStripButton2_Click(sender As Object, e As EventArgs) Handles FillVariablesToolStripButton.Click
+    Private Sub OnClickFillVariablesToolStripButton(sender As Object, e As EventArgs) Handles FillVariablesToolStripButton.Click
         ' Check if there's ZPL code to process
         If String.IsNullOrWhiteSpace(RawZPLText.Text) Then
             MessageBox.Show("Please enter ZPL code first.")
@@ -692,40 +876,55 @@ Public Class RawFileEdit
         End If
     End Sub
 
-    
-
-    Private Sub OnZPLCodeChange(sender As Object, e As EventArgs) Handles RawZPLText.TextChanged
-        If boolStartup Then
-            Console.WriteLine("Startup Mode. Skipping ZPL Code Change.")
+    Private Sub OnLabelChanged(sender As Object, e As EventArgs) Handles DensityComboBox.SelectedIndexChanged, ImagingModeComboBox.SelectedIndexChanged, LabelWidthBox.TextChanged, LabelHeightBox.TextChanged, UnitComboBox.SelectedIndexChanged, RawZPLText.TextChanged
+        If boolStartup OrElse TreeView1.SelectedNode Is Nothing OrElse TreeView1.SelectedNode.Level = 0 Then
             Return
         End If
         boolLabelChange = True
-        If TreeView1.SelectedNode Is Nothing OrElse TreeView1.SelectedNode.Level = 0 Then
-            Console.WriteLine("No Selected Node or selected Node is a Folder. Skipping ZPL Code Change.")
-            Return
-        End If
-
         MarkNodeAsChanged(TreeView1.SelectedNode)
-        
-        Console.WriteLine($"ZPL Code Changed. Selected Node: {TreeView1.SelectedNode.Text}")
+        If sender IsNot RawZPLText AndAlso LabelHeightBox.TextLength > 0 AndAlso LabelWidthBox.TextLength > 0 AndAlso _ZplConverter.IsValidZPL(RawZPLText.Text) Then
+            DrawLabel()
+        End If
     End Sub
 
+    Private Sub OnClickNewLabel(sender As Object, e As EventArgs) Handles NewLabelToolStripButton.Click
+        If boolLabelChange Then
+            Dim choice As DialogResult = TreeView1_BeforeSelect(Nothing, Nothing)
+            If choice = DialogResult.Cancel Then
+                Return
+            End If
+            boolLabelChange = False
+            boolStartup = True
+            pnlZPL.Visible = False
+        End If
 
-    Private Sub OnClickNewFile(sender As Object, e As EventArgs) Handles NewFileToolStripButton.Click
         Try
             RawZPLText.Text = ""
-            Dim fu As New frmSave
-            fu.ConnectionString = _ConnectionString
-            fu.ShowDialog()
+            Dim fs As New frmSave
+            fs.ConnectionString = _ConnectionString
+            If TreeView1.Nodes.Count > 0 Then
+                If TreeView1.SelectedNode Is Nothing Then
+                    fs.cboReportCategory.Text = TreeView1.Nodes(0).Text
+                ElseIf TreeView1.SelectedNode.Level = 0 Then
+                    fs.cboReportCategory.Text = TreeView1.SelectedNode.Text
+                Else
+                    fs.cboReportCategory.Text = TreeView1.Nodes(0).Text
+                End If
+            End If
+            fs.ShowDialog()
 
-            If fu.DialogResult = Windows.Forms.DialogResult.Cancel Then
+            If fs.DialogResult = Windows.Forms.DialogResult.Cancel Then
+                _currentLabel = ""
+                _currentparent = ""
+                _lastHitContextMenuNode = Nothing
+                TreeView1.SelectedNode = Nothing
                 Exit Sub
             End If
-            Dim strLabelName As String = fu.txtReportName.Text
-            Dim strLabelType As String = fu.cboReportCategory.Text
+            Dim strLabelName As String = fs.txtReportName.Text
+            Dim strLabelType As String = fs.cboReportCategory.Text
             If doesExist(strLabelName) Then
                 MessageBox.Show("Report " & strLabelName & "already exist. Please Choose another Name.")
-                fu.ShowDialog()
+                fs.ShowDialog()
             End If
             If strLabelName = "" Then
                 Exit Sub
@@ -747,7 +946,7 @@ Public Class RawFileEdit
                 cmd.Connection = Conn
                 cmd.ExecuteNonQuery()
                 CheckforNodeExistence(strLabelType)
-                TreeView1.Nodes(strLabelType).Nodes.Add(strLabelName, strLabelName, 0, 0)
+                TreeView1.Nodes(strLabelType).Nodes.Add(strLabelName, strLabelName, "FILE", "FILE")
                 TreeView1.SelectedNode = TreeView1.Nodes(strLabelType).Nodes(strLabelName)
                 _currentparent = strLabelType
                 _currentLabel = strLabelName
@@ -843,8 +1042,6 @@ Public Class RawFileEdit
         Dim height As Single = ConvertToInches(LabelHeightBox.Text, units)
 
         Dim size As String = width & "x" & height
-
-        Console.WriteLine("Size: " & size)
 
         Dim imageStream As MemoryStream = _ZplConverter.FetchImageDataFromAPI(RawZPLText.Text, size, dpm, contentTypeHeaderValue, quality)
         Return imageStream
@@ -987,5 +1184,126 @@ Public Class RawFileEdit
             e.SuppressKeyPress = True
         End If
     End Sub
-    
+
+    Private Sub OnLeaveLabelWidthBox(sender As Object, e As EventArgs) Handles LabelWidthBox.Leave
+        If LabelWidthBox.Text = "" Then
+            LabelWidthBox.Text = "4"
+        End If
+    End Sub
+
+    Private Sub OnLeaveLabelHeightBox(sender As Object, e As EventArgs) Handles LabelHeightBox.Leave
+        If LabelHeightBox.Text = "" Then
+            LabelHeightBox.Text = "6"
+        End If
+    End Sub
+
+    Private Sub OnOpeningContextMenu(sender As Object, e As CancelEventArgs) Handles ContextMenuStrip6.Opening
+        Dim node As TreeNode = TreeView1.SelectedNode
+        Dim pt As Point = TreeView1.PointToClient(Control.MousePosition)
+        Dim hit As TreeNode = TreeView1.GetNodeAt(pt)
+        _lastHitContextMenuNode = hit
+        If hit Is Nothing Then
+            e.Cancel = True
+            Exit Sub
+        End If
+        node = hit
+        Dim newFileButton As ToolStripMenuItem = ContextMenuStrip6.Items(0)
+        Dim addButton As ToolStripMenuItem = ContextMenuStrip6.Items(1)
+        Dim deleteButton As ToolStripMenuItem = ContextMenuStrip6.Items(2)
+        Dim saveButton As ToolStripMenuItem = ContextMenuStrip6.Items(3)
+        Dim printButton As ToolStripMenuItem = ContextMenuStrip6.Items(4)
+        If node.Level = 0 Then
+            ' For now no new file button
+            newFileButton.Visible = True
+            addButton.Visible = True
+            deleteButton.Visible = False
+            saveButton.Visible = False
+            printButton.Visible = False
+        Else
+            newFileButton.Visible = False
+            addButton.Visible = False
+            deleteButton.Visible = True
+            printButton.Visible = False
+            saveButton.Visible = True
+            ' If not current label, hide save button.
+            If node.Text <> _currentLabel Then
+                saveButton.Visible = False
+            End If
+        End If
+    End Sub
+
+    Private Sub OnClickNewToolStripMenuItem(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles NewFileToolStripMenuItem.Click
+        If boolLabelChange Then
+            Dim choice As DialogResult = TreeView1_BeforeSelect(Nothing, Nothing)
+            If choice = DialogResult.Cancel Then
+                Return
+            End If
+            boolLabelChange = False
+            boolStartup = True
+            pnlZPL.Visible = False
+        End If
+
+        Dim fs As New frmSave
+        fs.ConnectionString = _ConnectionString
+        If TreeView1.Nodes.Count > 0 Then
+            If _lastHitContextMenuNode IsNot Nothing AndAlso _lastHitContextMenuNode.Level = 0 Then
+                fs.cboReportCategory.Text = _lastHitContextMenuNode.Text
+            End If
+        End If
+        fs.ShowDialog()
+
+        If fs.DialogResult = Windows.Forms.DialogResult.Cancel Then
+            _currentLabel = ""
+            _currentparent = ""
+            _lastHitContextMenuNode = Nothing
+            TreeView1.SelectedNode = Nothing
+            Exit Sub
+        End If
+        Dim strLabelName As String = fs.txtReportName.Text
+        Dim strLabelType As String = fs.cboReportCategory.Text
+        If doesExist(strLabelName) Then
+            MessageBox.Show("Report " & strLabelName & "already exist. Please Choose another Name.")
+            fs.ShowDialog()
+        End If
+        If strLabelName = "" Then
+            Exit Sub
+        End If
+
+        Dim Conn As New SqlClient.SqlConnection(_ConnectionString)
+        Dim cmd As SqlClient.SqlCommand = Nothing
+        Try
+            Conn.Open()
+            cmd = New SqlClient.SqlCommand
+            cmd.CommandType = CommandType.Text
+            cmd.CommandText = "INSERT INTO Reports(ReportDescription, REPORTFILE,REPORTPROGRAM,REPORTTYPE) VALUES (@LABELNAME, @LABELCONTENT,'RAWTEXT',@REPORTTYPE)"
+            cmd.Parameters.AddWithValue("@LABELNAME", strLabelName)
+            cmd.Parameters.AddWithValue("@REPORTTYPE", strLabelType)
+            Dim strLABELCONTENTS As String = ""
+            Dim b As Byte() = Encoding.Unicode.GetBytes(strLABELCONTENTS)
+            cmd.Parameters.AddWithValue("@LabelContent", b)
+            cmd.Connection = Conn
+            cmd.ExecuteNonQuery()
+            CheckforNodeExistence(strLabelType)
+            TreeView1.Nodes(strLabelType).Nodes.Add(strLabelName, strLabelName, "FILE", "FILE")
+            TreeView1.SelectedNode = TreeView1.Nodes(strLabelType).Nodes(strLabelName)
+            _lastHitContextMenuNode = TreeView1.Nodes(strLabelType).Nodes(strLabelName)
+            _currentparent = strLabelType
+            _currentLabel = strLabelName
+
+        Catch ex As SqlClient.SqlException
+
+        Catch ex As Exception
+
+        Finally
+            If Conn.State = ConnectionState.Open Then
+                Conn.Close()
+                Conn.Dispose()
+                Conn = Nothing
+            End If
+            cmd.Dispose()
+            cmd = Nothing
+        End Try
+
+    End Sub
+
 End Class

@@ -23,60 +23,127 @@ Partial Class RawFileEdit
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(RawFileEdit))
-        Me.RichTextBox1 = New System.Windows.Forms.RichTextBox()
+        Me.RawZPLText = New System.Windows.Forms.RichTextBox()
         Me.ContextMenuStrip6 = New System.Windows.Forms.ContextMenuStrip(Me.components)
-        Me.SplitContainer1 = New System.Windows.Forms.SplitContainer()
-        Me.TreeView1 = New System.Windows.Forms.TreeView()
-        Me.ImageList1 = New System.Windows.Forms.ImageList(Me.components)
-        Me.pnlZPL = New System.Windows.Forms.Panel()
-        Me.ComboBox1 = New System.Windows.Forms.ComboBox()
-        Me.Label2 = New System.Windows.Forms.Label()
-        Me.TextBox2 = New System.Windows.Forms.TextBox()
-        Me.Label1 = New System.Windows.Forms.Label()
-        Me.TextBox1 = New System.Windows.Forms.TextBox()
-        Me.ToolStrip1 = New System.Windows.Forms.ToolStrip()
-        Me.lblSelected = New System.Windows.Forms.Label()
+        Me.NewFileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.AddToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.DeleteToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.SaveToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.PrintToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.PictureBox1 = New System.Windows.Forms.PictureBox()
-        Me.cmdAdd = New System.Windows.Forms.ToolStripButton()
-        Me.cmdDelete = New System.Windows.Forms.ToolStripButton()
-        Me.cmdSave = New System.Windows.Forms.ToolStripButton()
-        Me.cmdPrint = New System.Windows.Forms.ToolStripButton()
-        Me.ToolStripButton1 = New System.Windows.Forms.ToolStripButton()
-        Me.ToolStripButton2 = New System.Windows.Forms.ToolStripButton()
-        Me.ToolStripButton3 = New System.Windows.Forms.ToolStripButton()
+        Me.SplitContainer1 = New System.Windows.Forms.SplitContainer()
+        Me.TreeView1 = New System.Windows.Forms.TreeView()
+        Me.ImageList1 = New System.Windows.Forms.ImageList(Me.components)
+        Me.pnlZPL = New System.Windows.Forms.Panel()
+        Me.FlowLayoutPanel1 = New System.Windows.Forms.FlowLayoutPanel()
+        Me.GroupBoxEditor = New System.Windows.Forms.Panel()
+        Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.PermalinkButton = New System.Windows.Forms.Button()
+        Me.OpenFileButton = New System.Windows.Forms.Button()
+        Me.RotateButton = New System.Windows.Forms.Button()
+        Me.RedrawButton = New System.Windows.Forms.Button()
+        Me.PrintOptionsGroupBox = New System.Windows.Forms.GroupBox()
+        Me.UnitComboBox = New System.Windows.Forms.ComboBox()
+        Me.Label2 = New System.Windows.Forms.Label()
+        Me.LabelHeightBox = New System.Windows.Forms.TextBox()
+        Me.LabelWidthBox = New System.Windows.Forms.TextBox()
+        Me.ImagingModeLabel = New System.Windows.Forms.Label()
+        Me.ImagingModeComboBox = New System.Windows.Forms.ComboBox()
+        Me.DensityLabel = New System.Windows.Forms.Label()
+        Me.DensityComboBox = New System.Windows.Forms.ComboBox()
+        Me.WidthHeightLabel = New System.Windows.Forms.Label()
+        Me.LinterGroupBox = New System.Windows.Forms.GroupBox()
+        Me.LinterWarningsLabel = New System.Windows.Forms.Label()
+        Me.GroupBoxPreview = New System.Windows.Forms.GroupBox()
+        Me.PreviewScrollPanel = New System.Windows.Forms.Panel()
+        Me.PreviewPictureBox = New System.Windows.Forms.PictureBox()
+        Me.DownloadsGroupBox = New System.Windows.Forms.GroupBox()
+        Me.DownloadButtonMultiPDF = New System.Windows.Forms.Button()
+        Me.DownloadButtonEPL = New System.Windows.Forms.Button()
+        Me.DownloadButtonPDF = New System.Windows.Forms.Button()
+        Me.DownloadButtonPNG = New System.Windows.Forms.Button()
+        Me.DownloadButtonZPL = New System.Windows.Forms.Button()
+        Me.lblSelected = New System.Windows.Forms.Label()
+        Me.ToolStrip1 = New System.Windows.Forms.ToolStrip()
+        Me.NewLabelToolStripButton = New System.Windows.Forms.ToolStripButton()
+        Me.AddFromFileToolStripButton = New System.Windows.Forms.ToolStripButton()
+        Me.DeleteToolStripButton = New System.Windows.Forms.ToolStripButton()
+        Me.SaveToolStripButton = New System.Windows.Forms.ToolStripButton()
+        Me.PrintToolStripButton = New System.Windows.Forms.ToolStripButton()
+        Me.RotateToolStripButton = New System.Windows.Forms.ToolStripButton()
+        Me.FillVariablesToolStripButton = New System.Windows.Forms.ToolStripButton()
         Me.ContextMenuStrip6.SuspendLayout()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
         Me.SplitContainer1.SuspendLayout()
         Me.pnlZPL.SuspendLayout()
+        Me.FlowLayoutPanel1.SuspendLayout()
+        Me.GroupBoxEditor.SuspendLayout()
+        Me.GroupBox1.SuspendLayout()
+        Me.PrintOptionsGroupBox.SuspendLayout()
+        Me.LinterGroupBox.SuspendLayout()
+        Me.GroupBoxPreview.SuspendLayout()
+        Me.PreviewScrollPanel.SuspendLayout()
+        CType(Me.PreviewPictureBox, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.DownloadsGroupBox.SuspendLayout()
         Me.ToolStrip1.SuspendLayout()
-        CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
-        'RichTextBox1
+        'RawZPLText
         '
-        Me.RichTextBox1.Location = New System.Drawing.Point(0, 0)
-        Me.RichTextBox1.Name = "RichTextBox1"
-        Me.RichTextBox1.Size = New System.Drawing.Size(366, 599)
-        Me.RichTextBox1.TabIndex = 5
-        Me.RichTextBox1.Text = ""
+        Me.RawZPLText.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.RawZPLText.Location = New System.Drawing.Point(0, 161)
+        Me.RawZPLText.Name = "RawZPLText"
+        Me.RawZPLText.Size = New System.Drawing.Size(450, 239)
+        Me.RawZPLText.TabIndex = 5
+        Me.RawZPLText.Text = ""
         '
         'ContextMenuStrip6
         '
         Me.ContextMenuStrip6.ImageScalingSize = New System.Drawing.Size(24, 24)
-        Me.ContextMenuStrip6.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AddToolStripMenuItem, Me.DeleteToolStripMenuItem, Me.SaveToolStripMenuItem, Me.PrintToolStripMenuItem})
+        Me.ContextMenuStrip6.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.NewFileToolStripMenuItem, Me.AddToolStripMenuItem, Me.DeleteToolStripMenuItem, Me.SaveToolStripMenuItem, Me.PrintToolStripMenuItem})
         Me.ContextMenuStrip6.Name = "ContextMenuStrip6"
-        Me.ContextMenuStrip6.Size = New System.Drawing.Size(116, 124)
+        Me.ContextMenuStrip6.Size = New System.Drawing.Size(155, 164)
+        '
+        'NewFileToolStripMenuItem
+        '
+        Me.NewFileToolStripMenuItem.Image = CType(resources.GetObject("NewFileToolStripMenuItem.Image"), System.Drawing.Image)
+        Me.NewFileToolStripMenuItem.Name = "NewFileToolStripMenuItem"
+        Me.NewFileToolStripMenuItem.Size = New System.Drawing.Size(154, 32)
+        Me.NewFileToolStripMenuItem.Text = "New"
+        '
+        'AddToolStripMenuItem
+        '
+        Me.AddToolStripMenuItem.Image = CType(resources.GetObject("AddToolStripMenuItem.Image"), System.Drawing.Image)
+        Me.AddToolStripMenuItem.Name = "AddToolStripMenuItem"
+        Me.AddToolStripMenuItem.Size = New System.Drawing.Size(154, 32)
+        Me.AddToolStripMenuItem.Text = "Add file"
+        '
+        'DeleteToolStripMenuItem
+        '
+        Me.DeleteToolStripMenuItem.Image = CType(resources.GetObject("DeleteToolStripMenuItem.Image"), System.Drawing.Image)
+        Me.DeleteToolStripMenuItem.Name = "DeleteToolStripMenuItem"
+        Me.DeleteToolStripMenuItem.Size = New System.Drawing.Size(154, 32)
+        Me.DeleteToolStripMenuItem.Text = "Delete"
+        '
+        'SaveToolStripMenuItem
+        '
+        Me.SaveToolStripMenuItem.Image = CType(resources.GetObject("SaveToolStripMenuItem.Image"), System.Drawing.Image)
+        Me.SaveToolStripMenuItem.Name = "SaveToolStripMenuItem"
+        Me.SaveToolStripMenuItem.Size = New System.Drawing.Size(154, 32)
+        Me.SaveToolStripMenuItem.Text = "Save"
+        '
+        'PrintToolStripMenuItem
+        '
+        Me.PrintToolStripMenuItem.Image = CType(resources.GetObject("PrintToolStripMenuItem.Image"), System.Drawing.Image)
+        Me.PrintToolStripMenuItem.Name = "PrintToolStripMenuItem"
+        Me.PrintToolStripMenuItem.Size = New System.Drawing.Size(154, 32)
+        Me.PrintToolStripMenuItem.Text = "Print"
         '
         'SplitContainer1
         '
         Me.SplitContainer1.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.SplitContainer1.Location = New System.Drawing.Point(0, 57)
+        Me.SplitContainer1.Location = New System.Drawing.Point(0, 70)
         Me.SplitContainer1.Name = "SplitContainer1"
         '
         'SplitContainer1.Panel1
@@ -85,9 +152,8 @@ Partial Class RawFileEdit
         '
         'SplitContainer1.Panel2
         '
-        Me.SplitContainer1.Panel2.Controls.Add(Me.RichTextBox1)
         Me.SplitContainer1.Panel2.Controls.Add(Me.pnlZPL)
-        Me.SplitContainer1.Size = New System.Drawing.Size(1348, 599)
+        Me.SplitContainer1.Size = New System.Drawing.Size(1348, 586)
         Me.SplitContainer1.SplitterDistance = 300
         Me.SplitContainer1.SplitterWidth = 5
         Me.SplitContainer1.TabIndex = 7
@@ -101,7 +167,7 @@ Partial Class RawFileEdit
         Me.TreeView1.Location = New System.Drawing.Point(0, 0)
         Me.TreeView1.Name = "TreeView1"
         Me.TreeView1.SelectedImageIndex = 0
-        Me.TreeView1.Size = New System.Drawing.Size(300, 599)
+        Me.TreeView1.Size = New System.Drawing.Size(300, 586)
         Me.TreeView1.TabIndex = 0
         '
         'ImageList1
@@ -115,63 +181,350 @@ Partial Class RawFileEdit
         '
         'pnlZPL
         '
+        Me.pnlZPL.Controls.Add(Me.FlowLayoutPanel1)
         Me.pnlZPL.Controls.Add(Me.lblSelected)
-        Me.pnlZPL.Controls.Add(Me.ComboBox1)
-        Me.pnlZPL.Controls.Add(Me.Label2)
-        Me.pnlZPL.Controls.Add(Me.TextBox2)
-        Me.pnlZPL.Controls.Add(Me.Label1)
-        Me.pnlZPL.Controls.Add(Me.TextBox1)
-        Me.pnlZPL.Controls.Add(Me.PictureBox1)
         Me.pnlZPL.Dock = System.Windows.Forms.DockStyle.Fill
         Me.pnlZPL.Location = New System.Drawing.Point(0, 0)
         Me.pnlZPL.Name = "pnlZPL"
-        Me.pnlZPL.Size = New System.Drawing.Size(1043, 599)
+        Me.pnlZPL.Size = New System.Drawing.Size(1043, 586)
         Me.pnlZPL.TabIndex = 7
-        Me.pnlZPL.Visible = False
         '
-        'ComboBox1
+        'FlowLayoutPanel1
         '
-        Me.ComboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.ComboBox1.FormattingEnabled = True
-        Me.ComboBox1.Items.AddRange(New Object() {"6 dpmm (152 dpi)", "8 dpmm (203 dpi)", "12 dpmm (300 dpi)", "24 dpmm (600 dpi)"})
-        Me.ComboBox1.Location = New System.Drawing.Point(556, 42)
-        Me.ComboBox1.Name = "ComboBox1"
-        Me.ComboBox1.Size = New System.Drawing.Size(188, 21)
-        Me.ComboBox1.TabIndex = 13
+        Me.FlowLayoutPanel1.AutoScroll = True
+        Me.FlowLayoutPanel1.Controls.Add(Me.GroupBoxEditor)
+        Me.FlowLayoutPanel1.Controls.Add(Me.GroupBoxPreview)
+        Me.FlowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.FlowLayoutPanel1.Location = New System.Drawing.Point(0, 34)
+        Me.FlowLayoutPanel1.Margin = New System.Windows.Forms.Padding(3, 8, 3, 3)
+        Me.FlowLayoutPanel1.Name = "FlowLayoutPanel1"
+        Me.FlowLayoutPanel1.Padding = New System.Windows.Forms.Padding(5)
+        Me.FlowLayoutPanel1.Size = New System.Drawing.Size(1043, 552)
+        Me.FlowLayoutPanel1.TabIndex = 20
+        '
+        'GroupBoxEditor
+        '
+        Me.GroupBoxEditor.Controls.Add(Me.RawZPLText)
+        Me.GroupBoxEditor.Controls.Add(Me.GroupBox1)
+        Me.GroupBoxEditor.Controls.Add(Me.PrintOptionsGroupBox)
+        Me.GroupBoxEditor.Controls.Add(Me.LinterGroupBox)
+        Me.GroupBoxEditor.Location = New System.Drawing.Point(8, 8)
+        Me.GroupBoxEditor.MaximumSize = New System.Drawing.Size(800, 0)
+        Me.GroupBoxEditor.MinimumSize = New System.Drawing.Size(300, 400)
+        Me.GroupBoxEditor.Name = "GroupBoxEditor"
+        Me.GroupBoxEditor.Size = New System.Drawing.Size(450, 400)
+        Me.GroupBoxEditor.TabIndex = 0
+        '
+        'GroupBox1
+        '
+        Me.GroupBox1.Controls.Add(Me.PermalinkButton)
+        Me.GroupBox1.Controls.Add(Me.OpenFileButton)
+        Me.GroupBox1.Controls.Add(Me.RotateButton)
+        Me.GroupBox1.Controls.Add(Me.RedrawButton)
+        Me.GroupBox1.Dock = System.Windows.Forms.DockStyle.Top
+        Me.GroupBox1.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.GroupBox1.Location = New System.Drawing.Point(0, 96)
+        Me.GroupBox1.Name = "GroupBox1"
+        Me.GroupBox1.Size = New System.Drawing.Size(450, 65)
+        Me.GroupBox1.TabIndex = 19
+        Me.GroupBox1.TabStop = False
+        Me.GroupBox1.Text = "Controls"
+        '
+        'PermalinkButton
+        '
+        Me.PermalinkButton.AutoSize = True
+        Me.PermalinkButton.Font = New System.Drawing.Font("Baskerville Old Face", 9.75!)
+        Me.PermalinkButton.Location = New System.Drawing.Point(280, 20)
+        Me.PermalinkButton.Name = "PermalinkButton"
+        Me.PermalinkButton.Size = New System.Drawing.Size(103, 33)
+        Me.PermalinkButton.TabIndex = 18
+        Me.PermalinkButton.Text = "Permalink"
+        Me.PermalinkButton.UseVisualStyleBackColor = True
+        '
+        'OpenFileButton
+        '
+        Me.OpenFileButton.AutoSize = True
+        Me.OpenFileButton.Font = New System.Drawing.Font("Baskerville Old Face", 9.75!)
+        Me.OpenFileButton.Location = New System.Drawing.Point(176, 20)
+        Me.OpenFileButton.Name = "OpenFileButton"
+        Me.OpenFileButton.Size = New System.Drawing.Size(95, 33)
+        Me.OpenFileButton.TabIndex = 17
+        Me.OpenFileButton.Text = "Open file"
+        Me.OpenFileButton.UseVisualStyleBackColor = True
+        '
+        'RotateButton
+        '
+        Me.RotateButton.AutoSize = True
+        Me.RotateButton.Font = New System.Drawing.Font("Baskerville Old Face", 9.75!)
+        Me.RotateButton.Location = New System.Drawing.Point(96, 20)
+        Me.RotateButton.Name = "RotateButton"
+        Me.RotateButton.Size = New System.Drawing.Size(71, 33)
+        Me.RotateButton.TabIndex = 3
+        Me.RotateButton.Text = "Rotate"
+        Me.RotateButton.UseVisualStyleBackColor = True
+        '
+        'RedrawButton
+        '
+        Me.RedrawButton.AutoSize = True
+        Me.RedrawButton.Font = New System.Drawing.Font("Baskerville Old Face", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.RedrawButton.Location = New System.Drawing.Point(7, 20)
+        Me.RedrawButton.Name = "RedrawButton"
+        Me.RedrawButton.Size = New System.Drawing.Size(80, 33)
+        Me.RedrawButton.TabIndex = 1
+        Me.RedrawButton.Text = "Redraw"
+        Me.RedrawButton.UseVisualStyleBackColor = True
+        '
+        'PrintOptionsGroupBox
+        '
+        Me.PrintOptionsGroupBox.Controls.Add(Me.UnitComboBox)
+        Me.PrintOptionsGroupBox.Controls.Add(Me.Label2)
+        Me.PrintOptionsGroupBox.Controls.Add(Me.LabelHeightBox)
+        Me.PrintOptionsGroupBox.Controls.Add(Me.LabelWidthBox)
+        Me.PrintOptionsGroupBox.Controls.Add(Me.ImagingModeLabel)
+        Me.PrintOptionsGroupBox.Controls.Add(Me.ImagingModeComboBox)
+        Me.PrintOptionsGroupBox.Controls.Add(Me.DensityLabel)
+        Me.PrintOptionsGroupBox.Controls.Add(Me.DensityComboBox)
+        Me.PrintOptionsGroupBox.Controls.Add(Me.WidthHeightLabel)
+        Me.PrintOptionsGroupBox.Dock = System.Windows.Forms.DockStyle.Top
+        Me.PrintOptionsGroupBox.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.PrintOptionsGroupBox.Location = New System.Drawing.Point(0, 0)
+        Me.PrintOptionsGroupBox.Name = "PrintOptionsGroupBox"
+        Me.PrintOptionsGroupBox.Size = New System.Drawing.Size(450, 96)
+        Me.PrintOptionsGroupBox.TabIndex = 16
+        Me.PrintOptionsGroupBox.TabStop = False
+        Me.PrintOptionsGroupBox.Text = "Print Options"
+        '
+        'UnitComboBox
+        '
+        Me.UnitComboBox.FormattingEnabled = True
+        Me.UnitComboBox.Items.AddRange(New Object() {"inches", "mm", "cm"})
+        Me.UnitComboBox.Location = New System.Drawing.Point(263, 58)
+        Me.UnitComboBox.Name = "UnitComboBox"
+        Me.UnitComboBox.Size = New System.Drawing.Size(107, 28)
+        Me.UnitComboBox.TabIndex = 19
         '
         'Label2
         '
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(491, 45)
+        Me.Label2.Location = New System.Drawing.Point(149, 61)
         Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(14, 13)
-        Me.Label2.TabIndex = 12
+        Me.Label2.Size = New System.Drawing.Size(20, 20)
+        Me.Label2.TabIndex = 18
         Me.Label2.Text = "x"
         '
-        'TextBox2
+        'LabelHeightBox
         '
-        Me.TextBox2.Location = New System.Drawing.Point(509, 42)
-        Me.TextBox2.Name = "TextBox2"
-        Me.TextBox2.Size = New System.Drawing.Size(41, 21)
-        Me.TextBox2.TabIndex = 11
-        Me.TextBox2.Text = "6"
+        Me.LabelHeightBox.Location = New System.Drawing.Point(177, 58)
+        Me.LabelHeightBox.Name = "LabelHeightBox"
+        Me.LabelHeightBox.Size = New System.Drawing.Size(66, 28)
+        Me.LabelHeightBox.TabIndex = 17
+        Me.LabelHeightBox.Text = "6"
+        Me.LabelHeightBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
-        'Label1
+        'LabelWidthBox
         '
-        Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(372, 42)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(70, 13)
-        Me.Label1.TabIndex = 10
-        Me.Label1.Text = "Label Size:"
+        Me.LabelWidthBox.Location = New System.Drawing.Point(74, 57)
+        Me.LabelWidthBox.Name = "LabelWidthBox"
+        Me.LabelWidthBox.Size = New System.Drawing.Size(66, 28)
+        Me.LabelWidthBox.TabIndex = 16
+        Me.LabelWidthBox.Text = "4"
+        Me.LabelWidthBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
-        'TextBox1
+        'ImagingModeLabel
         '
-        Me.TextBox1.Location = New System.Drawing.Point(448, 42)
-        Me.TextBox1.Name = "TextBox1"
-        Me.TextBox1.Size = New System.Drawing.Size(35, 21)
-        Me.TextBox1.TabIndex = 9
-        Me.TextBox1.Text = "4"
+        Me.ImagingModeLabel.AutoSize = True
+        Me.ImagingModeLabel.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.ImagingModeLabel.Location = New System.Drawing.Point(232, 26)
+        Me.ImagingModeLabel.Name = "ImagingModeLabel"
+        Me.ImagingModeLabel.Size = New System.Drawing.Size(104, 20)
+        Me.ImagingModeLabel.TabIndex = 14
+        Me.ImagingModeLabel.Text = "Color Mode"
+        '
+        'ImagingModeComboBox
+        '
+        Me.ImagingModeComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.ImagingModeComboBox.FormattingEnabled = True
+        Me.ImagingModeComboBox.Items.AddRange(New Object() {"Grayscale", "Bitonal"})
+        Me.ImagingModeComboBox.Location = New System.Drawing.Point(311, 23)
+        Me.ImagingModeComboBox.Name = "ImagingModeComboBox"
+        Me.ImagingModeComboBox.Size = New System.Drawing.Size(107, 28)
+        Me.ImagingModeComboBox.TabIndex = 15
+        '
+        'DensityLabel
+        '
+        Me.DensityLabel.AutoSize = True
+        Me.DensityLabel.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.DensityLabel.Location = New System.Drawing.Point(8, 26)
+        Me.DensityLabel.Name = "DensityLabel"
+        Me.DensityLabel.Size = New System.Drawing.Size(74, 20)
+        Me.DensityLabel.TabIndex = 0
+        Me.DensityLabel.Text = "Density"
+        '
+        'DensityComboBox
+        '
+        Me.DensityComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.DensityComboBox.FormattingEnabled = True
+        Me.DensityComboBox.Items.AddRange(New Object() {"6 dpmm (152 dpi)", "8 dpmm (203 dpi)", "12 dpmm (300 dpi)", "24 dpmm (600 dpi)"})
+        Me.DensityComboBox.Location = New System.Drawing.Point(64, 23)
+        Me.DensityComboBox.Name = "DensityComboBox"
+        Me.DensityComboBox.Size = New System.Drawing.Size(153, 28)
+        Me.DensityComboBox.TabIndex = 13
+        '
+        'WidthHeightLabel
+        '
+        Me.WidthHeightLabel.AutoSize = True
+        Me.WidthHeightLabel.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.WidthHeightLabel.Location = New System.Drawing.Point(7, 61)
+        Me.WidthHeightLabel.Name = "WidthHeightLabel"
+        Me.WidthHeightLabel.Size = New System.Drawing.Size(96, 20)
+        Me.WidthHeightLabel.TabIndex = 10
+        Me.WidthHeightLabel.Text = "Label Size"
+        '
+        'LinterGroupBox
+        '
+        Me.LinterGroupBox.Controls.Add(Me.LinterWarningsLabel)
+        Me.LinterGroupBox.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.LinterGroupBox.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.LinterGroupBox.Location = New System.Drawing.Point(0, 0)
+        Me.LinterGroupBox.Name = "LinterGroupBox"
+        Me.LinterGroupBox.Size = New System.Drawing.Size(450, 400)
+        Me.LinterGroupBox.TabIndex = 17
+        Me.LinterGroupBox.TabStop = False
+        Me.LinterGroupBox.Text = "Linter Warnings"
+        '
+        'LinterWarningsLabel
+        '
+        Me.LinterWarningsLabel.AutoSize = True
+        Me.LinterWarningsLabel.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.LinterWarningsLabel.Location = New System.Drawing.Point(7, 26)
+        Me.LinterWarningsLabel.Name = "LinterWarningsLabel"
+        Me.LinterWarningsLabel.Size = New System.Drawing.Size(53, 20)
+        Me.LinterWarningsLabel.TabIndex = 0
+        Me.LinterWarningsLabel.Text = "None"
+        '
+        'GroupBoxPreview
+        '
+        Me.GroupBoxPreview.Controls.Add(Me.PreviewScrollPanel)
+        Me.GroupBoxPreview.Controls.Add(Me.DownloadsGroupBox)
+        Me.GroupBoxPreview.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.GroupBoxPreview.Location = New System.Drawing.Point(464, 8)
+        Me.GroupBoxPreview.MaximumSize = New System.Drawing.Size(800, 0)
+        Me.GroupBoxPreview.MinimumSize = New System.Drawing.Size(300, 400)
+        Me.GroupBoxPreview.Name = "GroupBoxPreview"
+        Me.GroupBoxPreview.Padding = New System.Windows.Forms.Padding(0, 5, 0, 0)
+        Me.GroupBoxPreview.Size = New System.Drawing.Size(450, 400)
+        Me.GroupBoxPreview.TabIndex = 1
+        Me.GroupBoxPreview.TabStop = False
+        Me.GroupBoxPreview.Text = "Preview"
+        '
+        'PreviewScrollPanel
+        '
+        Me.PreviewScrollPanel.AutoScroll = True
+        Me.PreviewScrollPanel.Controls.Add(Me.PreviewPictureBox)
+        Me.PreviewScrollPanel.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.PreviewScrollPanel.Location = New System.Drawing.Point(0, 26)
+        Me.PreviewScrollPanel.Name = "PreviewScrollPanel"
+        Me.PreviewScrollPanel.Padding = New System.Windows.Forms.Padding(3)
+        Me.PreviewScrollPanel.Size = New System.Drawing.Size(450, 292)
+        Me.PreviewScrollPanel.TabIndex = 19
+        '
+        'PreviewPictureBox
+        '
+        Me.PreviewPictureBox.BackColor = System.Drawing.Color.White
+        Me.PreviewPictureBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.PreviewPictureBox.Location = New System.Drawing.Point(3, 3)
+        Me.PreviewPictureBox.Name = "PreviewPictureBox"
+        Me.PreviewPictureBox.Size = New System.Drawing.Size(444, 300)
+        Me.PreviewPictureBox.TabIndex = 6
+        Me.PreviewPictureBox.TabStop = False
+        '
+        'DownloadsGroupBox
+        '
+        Me.DownloadsGroupBox.AutoSize = True
+        Me.DownloadsGroupBox.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
+        Me.DownloadsGroupBox.Controls.Add(Me.DownloadButtonMultiPDF)
+        Me.DownloadsGroupBox.Controls.Add(Me.DownloadButtonEPL)
+        Me.DownloadsGroupBox.Controls.Add(Me.DownloadButtonPDF)
+        Me.DownloadsGroupBox.Controls.Add(Me.DownloadButtonPNG)
+        Me.DownloadsGroupBox.Controls.Add(Me.DownloadButtonZPL)
+        Me.DownloadsGroupBox.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.DownloadsGroupBox.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.DownloadsGroupBox.Location = New System.Drawing.Point(0, 318)
+        Me.DownloadsGroupBox.Margin = New System.Windows.Forms.Padding(6, 3, 3, 3)
+        Me.DownloadsGroupBox.Name = "DownloadsGroupBox"
+        Me.DownloadsGroupBox.Padding = New System.Windows.Forms.Padding(9, 3, 3, 3)
+        Me.DownloadsGroupBox.Size = New System.Drawing.Size(450, 82)
+        Me.DownloadsGroupBox.TabIndex = 18
+        Me.DownloadsGroupBox.TabStop = False
+        Me.DownloadsGroupBox.Text = "Download"
+        '
+        'DownloadButtonMultiPDF
+        '
+        Me.DownloadButtonMultiPDF.AutoSize = True
+        Me.DownloadButtonMultiPDF.Font = New System.Drawing.Font("Baskerville Old Face", 9.75!)
+        Me.DownloadButtonMultiPDF.Location = New System.Drawing.Point(265, 22)
+        Me.DownloadButtonMultiPDF.Name = "DownloadButtonMultiPDF"
+        Me.DownloadButtonMultiPDF.Size = New System.Drawing.Size(156, 33)
+        Me.DownloadButtonMultiPDF.TabIndex = 22
+        Me.DownloadButtonMultiPDF.Text = "Multi-Label PDF"
+        Me.DownloadButtonMultiPDF.UseVisualStyleBackColor = True
+        '
+        'DownloadButtonEPL
+        '
+        Me.DownloadButtonEPL.AutoSize = True
+        Me.DownloadButtonEPL.Font = New System.Drawing.Font("Baskerville Old Face", 9.75!)
+        Me.DownloadButtonEPL.Location = New System.Drawing.Point(203, 22)
+        Me.DownloadButtonEPL.Name = "DownloadButtonEPL"
+        Me.DownloadButtonEPL.Size = New System.Drawing.Size(56, 33)
+        Me.DownloadButtonEPL.TabIndex = 21
+        Me.DownloadButtonEPL.Text = "EPL"
+        Me.DownloadButtonEPL.UseVisualStyleBackColor = True
+        '
+        'DownloadButtonPDF
+        '
+        Me.DownloadButtonPDF.AutoSize = True
+        Me.DownloadButtonPDF.Font = New System.Drawing.Font("Baskerville Old Face", 9.75!)
+        Me.DownloadButtonPDF.Location = New System.Drawing.Point(139, 22)
+        Me.DownloadButtonPDF.Name = "DownloadButtonPDF"
+        Me.DownloadButtonPDF.Size = New System.Drawing.Size(58, 33)
+        Me.DownloadButtonPDF.TabIndex = 20
+        Me.DownloadButtonPDF.Text = "PDF"
+        Me.DownloadButtonPDF.UseVisualStyleBackColor = True
+        '
+        'DownloadButtonPNG
+        '
+        Me.DownloadButtonPNG.AutoSize = True
+        Me.DownloadButtonPNG.Font = New System.Drawing.Font("Baskerville Old Face", 9.75!)
+        Me.DownloadButtonPNG.Location = New System.Drawing.Point(71, 22)
+        Me.DownloadButtonPNG.Name = "DownloadButtonPNG"
+        Me.DownloadButtonPNG.Size = New System.Drawing.Size(62, 33)
+        Me.DownloadButtonPNG.TabIndex = 19
+        Me.DownloadButtonPNG.Text = "PNG"
+        Me.DownloadButtonPNG.UseVisualStyleBackColor = True
+        '
+        'DownloadButtonZPL
+        '
+        Me.DownloadButtonZPL.AutoSize = True
+        Me.DownloadButtonZPL.Font = New System.Drawing.Font("Baskerville Old Face", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.DownloadButtonZPL.Location = New System.Drawing.Point(9, 22)
+        Me.DownloadButtonZPL.Name = "DownloadButtonZPL"
+        Me.DownloadButtonZPL.Size = New System.Drawing.Size(56, 33)
+        Me.DownloadButtonZPL.TabIndex = 18
+        Me.DownloadButtonZPL.Text = "ZPL"
+        Me.DownloadButtonZPL.UseVisualStyleBackColor = True
+        '
+        'lblSelected
+        '
+        Me.lblSelected.AutoSize = True
+        Me.lblSelected.Dock = System.Windows.Forms.DockStyle.Top
+        Me.lblSelected.Font = New System.Drawing.Font("Verdana", 12.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblSelected.ForeColor = System.Drawing.Color.FromArgb(CType(CType(44, Byte), Integer), CType(CType(82, Byte), Integer), CType(CType(139, Byte), Integer))
+        Me.lblSelected.Location = New System.Drawing.Point(0, 0)
+        Me.lblSelected.Name = "lblSelected"
+        Me.lblSelected.Padding = New System.Windows.Forms.Padding(5, 5, 0, 0)
+        Me.lblSelected.Size = New System.Drawing.Size(257, 34)
+        Me.lblSelected.TabIndex = 14
+        Me.lblSelected.Text = "No Label Selected"
         '
         'ToolStrip1
         '
@@ -179,130 +532,82 @@ Partial Class RawFileEdit
         Me.ToolStrip1.Font = New System.Drawing.Font("Verdana", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ToolStrip1.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
         Me.ToolStrip1.ImageScalingSize = New System.Drawing.Size(32, 32)
-        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton3, Me.cmdAdd, Me.cmdDelete, Me.cmdSave, Me.cmdPrint, Me.ToolStripButton1, Me.ToolStripButton2})
+        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.NewLabelToolStripButton, Me.AddFromFileToolStripButton, Me.DeleteToolStripButton, Me.SaveToolStripButton, Me.PrintToolStripButton, Me.RotateToolStripButton, Me.FillVariablesToolStripButton})
         Me.ToolStrip1.Location = New System.Drawing.Point(0, 0)
         Me.ToolStrip1.Name = "ToolStrip1"
-        Me.ToolStrip1.Size = New System.Drawing.Size(1348, 57)
+        Me.ToolStrip1.Size = New System.Drawing.Size(1348, 70)
         Me.ToolStrip1.TabIndex = 8
         Me.ToolStrip1.Text = "ToolStrip1"
         '
-        'lblSelected
+        'NewLabelToolStripButton
         '
-        Me.lblSelected.AutoSize = True
-        Me.lblSelected.Font = New System.Drawing.Font("Verdana", 12.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lblSelected.ForeColor = System.Drawing.Color.FromArgb(CType(CType(44, Byte), Integer), CType(CType(82, Byte), Integer), CType(CType(139, Byte), Integer))
-        Me.lblSelected.Location = New System.Drawing.Point(372, 9)
-        Me.lblSelected.Name = "lblSelected"
-        Me.lblSelected.Size = New System.Drawing.Size(0, 18)
-        Me.lblSelected.TabIndex = 14
+        Me.NewLabelToolStripButton.ForeColor = System.Drawing.Color.White
+        Me.NewLabelToolStripButton.Image = CType(resources.GetObject("NewLabelToolStripButton.Image"), System.Drawing.Image)
+        Me.NewLabelToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.NewLabelToolStripButton.Name = "NewLabelToolStripButton"
+        Me.NewLabelToolStripButton.Size = New System.Drawing.Size(69, 65)
+        Me.NewLabelToolStripButton.Text = "New"
+        Me.NewLabelToolStripButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText
         '
-        'AddToolStripMenuItem
+        'AddFromFileToolStripButton
         '
-        Me.AddToolStripMenuItem.Image = CType(resources.GetObject("AddToolStripMenuItem.Image"), System.Drawing.Image)
-        Me.AddToolStripMenuItem.Name = "AddToolStripMenuItem"
-        Me.AddToolStripMenuItem.Size = New System.Drawing.Size(115, 30)
-        Me.AddToolStripMenuItem.Text = "Add"
+        Me.AddFromFileToolStripButton.ForeColor = System.Drawing.Color.White
+        Me.AddFromFileToolStripButton.Image = CType(resources.GetObject("AddFromFileToolStripButton.Image"), System.Drawing.Image)
+        Me.AddFromFileToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.AddFromFileToolStripButton.Name = "AddFromFileToolStripButton"
+        Me.AddFromFileToolStripButton.Size = New System.Drawing.Size(175, 65)
+        Me.AddFromFileToolStripButton.Text = "Add from File"
+        Me.AddFromFileToolStripButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText
         '
-        'DeleteToolStripMenuItem
+        'DeleteToolStripButton
         '
-        Me.DeleteToolStripMenuItem.Image = CType(resources.GetObject("DeleteToolStripMenuItem.Image"), System.Drawing.Image)
-        Me.DeleteToolStripMenuItem.Name = "DeleteToolStripMenuItem"
-        Me.DeleteToolStripMenuItem.Size = New System.Drawing.Size(115, 30)
-        Me.DeleteToolStripMenuItem.Text = "Delete"
+        Me.DeleteToolStripButton.ForeColor = System.Drawing.Color.White
+        Me.DeleteToolStripButton.Image = CType(resources.GetObject("DeleteToolStripButton.Image"), System.Drawing.Image)
+        Me.DeleteToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.DeleteToolStripButton.Name = "DeleteToolStripButton"
+        Me.DeleteToolStripButton.Size = New System.Drawing.Size(93, 65)
+        Me.DeleteToolStripButton.Text = "Delete"
+        Me.DeleteToolStripButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText
         '
-        'SaveToolStripMenuItem
+        'SaveToolStripButton
         '
-        Me.SaveToolStripMenuItem.Image = CType(resources.GetObject("SaveToolStripMenuItem.Image"), System.Drawing.Image)
-        Me.SaveToolStripMenuItem.Name = "SaveToolStripMenuItem"
-        Me.SaveToolStripMenuItem.Size = New System.Drawing.Size(115, 30)
-        Me.SaveToolStripMenuItem.Text = "Save"
+        Me.SaveToolStripButton.ForeColor = System.Drawing.Color.White
+        Me.SaveToolStripButton.Image = CType(resources.GetObject("SaveToolStripButton.Image"), System.Drawing.Image)
+        Me.SaveToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.SaveToolStripButton.Name = "SaveToolStripButton"
+        Me.SaveToolStripButton.Size = New System.Drawing.Size(75, 65)
+        Me.SaveToolStripButton.Text = "Save"
+        Me.SaveToolStripButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText
         '
-        'PrintToolStripMenuItem
+        'PrintToolStripButton
         '
-        Me.PrintToolStripMenuItem.Image = CType(resources.GetObject("PrintToolStripMenuItem.Image"), System.Drawing.Image)
-        Me.PrintToolStripMenuItem.Name = "PrintToolStripMenuItem"
-        Me.PrintToolStripMenuItem.Size = New System.Drawing.Size(115, 30)
-        Me.PrintToolStripMenuItem.Text = "Print"
+        Me.PrintToolStripButton.ForeColor = System.Drawing.Color.White
+        Me.PrintToolStripButton.Image = CType(resources.GetObject("PrintToolStripButton.Image"), System.Drawing.Image)
+        Me.PrintToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.PrintToolStripButton.Name = "PrintToolStripButton"
+        Me.PrintToolStripButton.Size = New System.Drawing.Size(71, 65)
+        Me.PrintToolStripButton.Text = "Print"
+        Me.PrintToolStripButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText
         '
-        'PictureBox1
+        'RotateToolStripButton
         '
-        Me.PictureBox1.BackColor = System.Drawing.Color.White
-        Me.PictureBox1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.PictureBox1.Location = New System.Drawing.Point(372, 78)
-        Me.PictureBox1.Name = "PictureBox1"
-        Me.PictureBox1.Size = New System.Drawing.Size(372, 373)
-        Me.PictureBox1.TabIndex = 6
-        Me.PictureBox1.TabStop = False
+        Me.RotateToolStripButton.ForeColor = System.Drawing.Color.White
+        Me.RotateToolStripButton.Image = CType(resources.GetObject("RotateToolStripButton.Image"), System.Drawing.Image)
+        Me.RotateToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.RotateToolStripButton.Name = "RotateToolStripButton"
+        Me.RotateToolStripButton.Size = New System.Drawing.Size(94, 65)
+        Me.RotateToolStripButton.Text = "Rotate"
+        Me.RotateToolStripButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText
         '
-        'cmdAdd
+        'FillVariablesToolStripButton
         '
-        Me.cmdAdd.ForeColor = System.Drawing.Color.White
-        Me.cmdAdd.Image = CType(resources.GetObject("cmdAdd.Image"), System.Drawing.Image)
-        Me.cmdAdd.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.cmdAdd.Name = "cmdAdd"
-        Me.cmdAdd.Size = New System.Drawing.Size(121, 54)
-        Me.cmdAdd.Text = "Add from File"
-        Me.cmdAdd.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText
-        '
-        'cmdDelete
-        '
-        Me.cmdDelete.ForeColor = System.Drawing.Color.White
-        Me.cmdDelete.Image = CType(resources.GetObject("cmdDelete.Image"), System.Drawing.Image)
-        Me.cmdDelete.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.cmdDelete.Name = "cmdDelete"
-        Me.cmdDelete.Size = New System.Drawing.Size(66, 54)
-        Me.cmdDelete.Text = "Delete"
-        Me.cmdDelete.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText
-        '
-        'cmdSave
-        '
-        Me.cmdSave.ForeColor = System.Drawing.Color.White
-        Me.cmdSave.Image = CType(resources.GetObject("cmdSave.Image"), System.Drawing.Image)
-        Me.cmdSave.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.cmdSave.Name = "cmdSave"
-        Me.cmdSave.Size = New System.Drawing.Size(51, 54)
-        Me.cmdSave.Text = "Save"
-        Me.cmdSave.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText
-        '
-        'cmdPrint
-        '
-        Me.cmdPrint.ForeColor = System.Drawing.Color.White
-        Me.cmdPrint.Image = CType(resources.GetObject("cmdPrint.Image"), System.Drawing.Image)
-        Me.cmdPrint.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.cmdPrint.Name = "cmdPrint"
-        Me.cmdPrint.Size = New System.Drawing.Size(50, 54)
-        Me.cmdPrint.Text = "Print"
-        Me.cmdPrint.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText
-        '
-        'ToolStripButton1
-        '
-        Me.ToolStripButton1.ForeColor = System.Drawing.Color.White
-        Me.ToolStripButton1.Image = CType(resources.GetObject("ToolStripButton1.Image"), System.Drawing.Image)
-        Me.ToolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.ToolStripButton1.Name = "ToolStripButton1"
-        Me.ToolStripButton1.Size = New System.Drawing.Size(67, 54)
-        Me.ToolStripButton1.Text = "Rotate"
-        Me.ToolStripButton1.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText
-        '
-        'ToolStripButton2
-        '
-        Me.ToolStripButton2.ForeColor = System.Drawing.Color.White
-        Me.ToolStripButton2.Image = CType(resources.GetObject("ToolStripButton2.Image"), System.Drawing.Image)
-        Me.ToolStripButton2.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.ToolStripButton2.Name = "ToolStripButton2"
-        Me.ToolStripButton2.Size = New System.Drawing.Size(117, 54)
-        Me.ToolStripButton2.Text = "Fill Variables"
-        Me.ToolStripButton2.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText
-        '
-        'ToolStripButton3
-        '
-        Me.ToolStripButton3.ForeColor = System.Drawing.Color.White
-        Me.ToolStripButton3.Image = CType(resources.GetObject("ToolStripButton3.Image"), System.Drawing.Image)
-        Me.ToolStripButton3.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.ToolStripButton3.Name = "ToolStripButton3"
-        Me.ToolStripButton3.Size = New System.Drawing.Size(47, 54)
-        Me.ToolStripButton3.Text = "New"
-        Me.ToolStripButton3.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText
+        Me.FillVariablesToolStripButton.ForeColor = System.Drawing.Color.White
+        Me.FillVariablesToolStripButton.Image = CType(resources.GetObject("FillVariablesToolStripButton.Image"), System.Drawing.Image)
+        Me.FillVariablesToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.FillVariablesToolStripButton.Name = "FillVariablesToolStripButton"
+        Me.FillVariablesToolStripButton.Size = New System.Drawing.Size(164, 65)
+        Me.FillVariablesToolStripButton.Text = "Fill Variables"
+        Me.FillVariablesToolStripButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText
         '
         'RawFileEdit
         '
@@ -322,15 +627,30 @@ Partial Class RawFileEdit
         Me.SplitContainer1.ResumeLayout(False)
         Me.pnlZPL.ResumeLayout(False)
         Me.pnlZPL.PerformLayout()
+        Me.FlowLayoutPanel1.ResumeLayout(False)
+        Me.GroupBoxEditor.ResumeLayout(False)
+        Me.GroupBox1.ResumeLayout(False)
+        Me.GroupBox1.PerformLayout()
+        Me.PrintOptionsGroupBox.ResumeLayout(False)
+        Me.PrintOptionsGroupBox.PerformLayout()
+        Me.LinterGroupBox.ResumeLayout(False)
+        Me.LinterGroupBox.PerformLayout()
+        Me.GroupBoxPreview.ResumeLayout(False)
+        Me.GroupBoxPreview.PerformLayout()
+        Me.PreviewScrollPanel.ResumeLayout(False)
+        CType(Me.PreviewPictureBox, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.DownloadsGroupBox.ResumeLayout(False)
+        Me.DownloadsGroupBox.PerformLayout()
         Me.ToolStrip1.ResumeLayout(False)
         Me.ToolStrip1.PerformLayout()
-        CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
     End Sub
-    Friend WithEvents RichTextBox1 As System.Windows.Forms.RichTextBox
+
+    Friend WithEvents RawZPLText As System.Windows.Forms.RichTextBox
     Friend WithEvents ContextMenuStrip6 As System.Windows.Forms.ContextMenuStrip
+    Friend WithEvents NewFileToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents AddToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents DeleteToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents SaveToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
@@ -339,19 +659,41 @@ Partial Class RawFileEdit
     Friend WithEvents ImageList1 As System.Windows.Forms.ImageList
     Friend WithEvents PrintToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ToolStrip1 As System.Windows.Forms.ToolStrip
-    Friend WithEvents cmdAdd As System.Windows.Forms.ToolStripButton
-    Friend WithEvents cmdDelete As System.Windows.Forms.ToolStripButton
-    Friend WithEvents cmdSave As System.Windows.Forms.ToolStripButton
-    Friend WithEvents cmdPrint As System.Windows.Forms.ToolStripButton
-    Friend WithEvents PictureBox1 As PictureBox
-    Friend WithEvents TextBox1 As TextBox
+    Friend WithEvents AddFromFileToolStripButton As System.Windows.Forms.ToolStripButton
+    Friend WithEvents DeleteToolStripButton As System.Windows.Forms.ToolStripButton
+    Friend WithEvents SaveToolStripButton As System.Windows.Forms.ToolStripButton
+    Friend WithEvents PrintToolStripButton As System.Windows.Forms.ToolStripButton
+    Friend WithEvents PreviewPictureBox As PictureBox
     Friend WithEvents pnlZPL As Panel
-    Friend WithEvents Label1 As Label
-    Friend WithEvents ComboBox1 As ComboBox
-    Friend WithEvents Label2 As Label
-    Friend WithEvents TextBox2 As TextBox
-    Friend WithEvents ToolStripButton1 As ToolStripButton
-    Friend WithEvents ToolStripButton2 As ToolStripButton
+    Friend WithEvents FlowLayoutPanel1 As FlowLayoutPanel
+    Friend WithEvents GroupBoxEditor As Panel
+    Friend WithEvents GroupBoxPreview As GroupBox
+    Friend WithEvents PreviewScrollPanel As Panel
+    Friend WithEvents WidthHeightLabel As Label
+    Friend WithEvents DensityComboBox As ComboBox
+    Friend WithEvents RotateToolStripButton As ToolStripButton
+    Friend WithEvents FillVariablesToolStripButton As ToolStripButton
     Friend WithEvents lblSelected As Label
-    Friend WithEvents ToolStripButton3 As ToolStripButton
+    Friend WithEvents NewLabelToolStripButton As ToolStripButton
+    Friend WithEvents PrintOptionsGroupBox As GroupBox
+    Friend WithEvents DensityLabel As Label
+    Friend WithEvents ImagingModeLabel As Label
+    Friend WithEvents ImagingModeComboBox As ComboBox
+    Friend WithEvents Label2 As Label
+    Friend WithEvents LabelHeightBox As TextBox
+    Friend WithEvents LabelWidthBox As TextBox
+    Friend WithEvents UnitComboBox As ComboBox
+    Friend WithEvents LinterGroupBox As GroupBox
+    Friend WithEvents LinterWarningsLabel As Label
+    Friend WithEvents DownloadsGroupBox As GroupBox
+    Friend WithEvents DownloadButtonMultiPDF As Button
+    Friend WithEvents DownloadButtonEPL As Button
+    Friend WithEvents DownloadButtonPDF As Button
+    Friend WithEvents DownloadButtonPNG As Button
+    Friend WithEvents DownloadButtonZPL As Button
+    Friend WithEvents GroupBox1 As GroupBox
+    Friend WithEvents PermalinkButton As Button
+    Friend WithEvents OpenFileButton As Button
+    Friend WithEvents RotateButton As Button
+    Friend WithEvents RedrawButton As Button
 End Class
